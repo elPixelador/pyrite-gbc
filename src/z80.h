@@ -32,12 +32,15 @@ typedef struct Registers
     unsigned short bc;
   };
 
+  unsigned short sp;
+  unsigned short pc;
+
 } Registers;
 
 typedef struct Z80
 {
   Registers registers;
-
+  Memory* memory;
 
 } Z80;
 

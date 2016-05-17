@@ -2,6 +2,7 @@
 #define MEMORY_SIZE 0xFFFF
 
 /* Starting Addresses for key locations in memory. */
+#define INTERRUPT_RST       0x000
 #define ROM_DATA            0x100
 #define USER_PROG_AREA      0x150
 #define BANK_CHAR_DATA      0x8000

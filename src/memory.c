@@ -3,10 +3,9 @@
 
 Memory* createMemory()
 {
-  Memory* mem = calloc(sizeof(char) * MEMORY_SIZE);
+  Memory* mem = calloc(sizeof(Memory));
 
-  if(mem == NULL)
-  {
+  if(mem == NULL) {
     fprintf(stderr," ERROR: Failed to allocate memory!\n");
   }
 
@@ -28,14 +27,12 @@ void loadROM(Memory* mem, const char* fileName)
 
   FILE* fp = fopen(fileName,"r");
 
-  if(fp == NULL)
-  {
+  if(fp == NULL) {
     fprintf(stderr," ERROR: Failed to open %s\n", fileName);
   }
 
   curIndex = &mem[ROM_DATA];
-  while((ch = getc(fp)) != EOF)
-  {
+  while((ch = getc(fp)) != EOF) {
     *curIndex = ch;
     curIndex++;
   }
@@ -45,5 +42,5 @@ void loadROM(Memory* mem, const char* fileName)
 
 void unloadROM(Memory* mem)
 {
-
+  
 }
