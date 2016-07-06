@@ -1,3 +1,4 @@
+#pragma once
 
 #define MEMORY_SIZE 0xFFFF
 
@@ -18,15 +19,13 @@
 #define WORK_STACK_RAM      0xFF80
 #define UNUSED              0xFFFE
 
-
 typedef struct Memory
 {
-  char memory[MEMORY_SIZE];
-
+  char data[MEMORY_SIZE];
 } Memory;
 
 Memory* createMemory();
-void unloadMemory(Memory* mem);
+void unloadMemory(Memory** mem);
 
 void loadROM(Memory* mem, const char* fileName);
 void unloadROM(Memory* mem);

@@ -1,9 +1,10 @@
-#include "Memory.h"
+#include "memory.h"
+#include <stdlib.h>
 #include <stdio.h>
 
 Memory* createMemory()
 {
-  Memory* mem = calloc(sizeof(Memory));
+  Memory* mem = malloc(sizeof(Memory));
 
   if(mem == NULL) {
     fprintf(stderr," ERROR: Failed to allocate memory!\n");
@@ -31,7 +32,7 @@ void loadROM(Memory* mem, const char* fileName)
     fprintf(stderr," ERROR: Failed to open %s\n", fileName);
   }
 
-  curIndex = &mem[ROM_DATA];
+  curIndex = &mem->data[ROM_DATA];
   while((ch = getc(fp)) != EOF) {
     *curIndex = ch;
     curIndex++;
@@ -42,5 +43,5 @@ void loadROM(Memory* mem, const char* fileName)
 
 void unloadROM(Memory* mem)
 {
-  
+
 }

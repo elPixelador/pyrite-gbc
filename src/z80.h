@@ -1,3 +1,5 @@
+#pragma once
+#include "memory.h"
 typedef struct Registers
 {
   union{
@@ -29,7 +31,7 @@ typedef struct Registers
         unsigned char h;
         unsigned char l;
     };
-    unsigned short bc;
+    unsigned short hl;
   };
 
   unsigned short sp;
@@ -45,3 +47,4 @@ typedef struct Z80
 } Z80;
 
 Z80* createCPU();
+void freeCPU(Z80* cpu);
