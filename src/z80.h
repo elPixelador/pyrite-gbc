@@ -1,3 +1,5 @@
+#pragma once
+
 typedef struct Registers
 {
   union{
@@ -41,7 +43,10 @@ typedef struct Z80
 {
   Registers registers;
   Memory* memory;
-
 } Z80;
 
 Z80* createCPU();
+void unloadCPU(Z80* cpu);
+
+// Gameboy Instruction Set
+void (*instruction)(int argc, char[] args);
