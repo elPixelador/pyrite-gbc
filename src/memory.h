@@ -27,5 +27,21 @@ typedef struct Memory
 Memory* createMemory();
 void unloadMemory(Memory** mem);
 
-void loadROM(Memory* mem, const char* fileName);
-void unloadROM(Memory* mem);
+/* Loads a rom into a special data store*/
+void loadROM(const char* fileName);
+
+/* Returns one byte of data starting from the address passed in contained within
+   the memory structure pointer. */
+char readByte(Memory* mem, char addr);
+
+/* Writes one byte of data starting from the address passed in contained within
+   the memory structure pointer. */
+void writeByte(Memory* mem, char addr, char byte);
+
+/* Returns one word of data (16 bytes) starting from the address passed in contained within
+   the memory structure pointer. */
+char readWord(Memory* mem, char addr);
+
+/* Writes one word of data (16 bytes) starting from the address passed in contained within
+   the memory structure pointer. */
+void writeWord(Memory* mem, char addr, short byte);

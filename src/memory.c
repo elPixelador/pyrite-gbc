@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+static char* rom;
+
 Memory* createMemory()
 {
   Memory* mem = malloc(sizeof(Memory));
@@ -15,33 +17,51 @@ Memory* createMemory()
 
 void unloadMemory(Memory** mem)
 {
-  if(*mem != NULL)
+  if(*mem)
     free(*mem);
 
   *mem = NULL;
 }
 
-void loadROM(Memory* mem, const char* fileName)
+void loadROM(const char* fileName)
 {
   char ch;
   char* curIndex;
+  int fileSize;
 
-  FILE* fp = fopen(fileName,"r");
+  /* If an existing rom is loaded we need to make sure to clean it out first. */
+  if(rom)
+    free(rom);
 
-  if(fp == NULL) {
+  FILE* fp = fopen(fileName,"rb");
+
+  /* Obtain file size */
+  fseek(fp, 0L, SEEK_END);
+  fileSize = ftell(fp);
+
+  /* Set file pointer back to start of rom. */
+  rewind(fp);
+
+  if(!fp)
     fprintf(stderr," ERROR: Failed to open %s\n", fileName);
-  }
 
-  curIndex = &mem->data[ROM_DATA];
-  while((ch = getc(fp)) != EOF) {
+  /* Allocate space for ROM and read into heap. */
+  rom = malloc(fileSize);
+
+  curIndex = rom;
+  while((ch = getc(fp)) != EOF)
+  {
     *curIndex = ch;
     curIndex++;
   }
 
   fclose(fp);
+
+  if(fp)
+    fprintf(stderr," ERROR: Failed to close %s\n", fileName);
 }
 
-void unloadROM(Memory* mem)
+char readbyte(Memory* mem, char addr)
 {
-
+  return mem->data[(int)addr];
 }

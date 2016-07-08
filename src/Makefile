@@ -1,4 +1,4 @@
-SOURCES=memory.c z80.c
+SOURCES=main.c memory.c z80.c
 HEADERS=memory.h z80.h
 BIN=../bin
 PROGRAM=../bin/pyrite
@@ -18,5 +18,5 @@ clean:
 	rm *.o $(PROGRAM)
 
 archive:
-	@echo "Creating archive..."
+	@echo "Creating source archive..."
 	zip $(USER)-a2 $(SOURCES) $(HEADERS) Makefile
