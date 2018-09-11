@@ -12,6 +12,7 @@ Z80* createCPU()
   cpu->registers.af = 0;
   cpu->registers.bc = 0;
   cpu->registers.de = 0;
+  cpu->registers.hl = 0;
   cpu->registers.bc = 0;
   cpu->registers.sp = 0;
   cpu->registers.pc = 0;
