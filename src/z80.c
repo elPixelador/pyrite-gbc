@@ -25,3 +25,8 @@ void unloadCPU(Z80* cpu)
 {
   unloadMemory(&cpu->memory);
 }
+
+void run(Z80* cpu, const char* rom) 
+{
+  loadROM(rom);
+}

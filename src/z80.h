@@ -62,7 +62,7 @@ typedef struct Z80
 Z80* createCPU();
 void unloadCPU(Z80* cpu);
 
-void run();
+void run(Z80* cpu, const char* rom);
 
 /* Gameboy Instruction Set */
 void (*instruction)(Z80* cpu);
