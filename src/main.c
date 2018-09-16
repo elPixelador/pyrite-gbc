@@ -1,13 +1,19 @@
 #include "z80.h"
 #include "memory.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 int main(int argc, char** argv)
 {
   Z80* cpu = createCPU();
   Memory* memory = createMemory();
 
-  run(cpu, memory, "./rom/cpu_instrs.gb");
+  if(argc < 2) {
+    fprintf( stderr, "ERROR: No rom file specified, cannot start emulation! Quitting.");
+    return EXIT_FAILURE;
+  }
+
+  run(cpu, memory, argv[1]);
 
   unloadCPU(&cpu);
   unloadMemory(&memory);
