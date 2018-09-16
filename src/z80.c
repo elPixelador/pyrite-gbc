@@ -220,8 +220,8 @@ void run(Z80* cpu, Memory* memory, const char* file)
       case 0xA9: xor_c(cpu, memory);         break;
       case 0xAA: xor_d(cpu, memory);         break;
       case 0xAB: xor_e(cpu, memory);         break;
-      case 0xAC: xor_f(cpu, memory);         break;
-      case 0xAD: xor_h(cpu, memory);         break;
+      case 0xAC: xor_h(cpu, memory);         break;
+      case 0xAD: xor_l(cpu, memory);         break;
       case 0xAE: xor_hl(cpu, memory);        break;
       case 0xAF: xor_a(cpu, memory);         break;
       case 0xB0: not_yet_implemented(instr); break;
