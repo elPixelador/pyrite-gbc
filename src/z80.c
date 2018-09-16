@@ -474,8 +474,7 @@ void cp_hl(Z80* cpu, Memory* memory) {
 }
 
 void xor_a(Z80* cpu, Memory* memory) {
-  unsigned char a = cpu->registers.a;
-  cpu->registers.a = ~((a&a)|(~a&~a));
+  cpu->registers.a ^= cpu->registers.a;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
   flag_unset(&cpu->registers, FLAG_SUBTRACT);
@@ -484,9 +483,7 @@ void xor_a(Z80* cpu, Memory* memory) {
 }
 
 void xor_b(Z80* cpu, Memory* memory) {
-  unsigned char a = cpu->registers.a;
-  unsigned char b = cpu->registers.b;
-  cpu->registers.a = ~((a&b)|(~a&~b));
+  cpu->registers.a ^= cpu->registers.b;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
   flag_unset(&cpu->registers, FLAG_SUBTRACT);
@@ -495,9 +492,7 @@ void xor_b(Z80* cpu, Memory* memory) {
 }
 
 void xor_c(Z80* cpu, Memory* memory) {
-  unsigned char a = cpu->registers.a;
-  unsigned char c = cpu->registers.c;
-  cpu->registers.a = ~((a&c)|(~a&~c));
+  cpu->registers.a ^= cpu->registers.c;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
   flag_unset(&cpu->registers, FLAG_SUBTRACT);
@@ -506,9 +501,7 @@ void xor_c(Z80* cpu, Memory* memory) {
 }
 
 void xor_d(Z80* cpu, Memory* memory) {
-  unsigned char a = cpu->registers.a;
-  unsigned char d = cpu->registers.d;
-  cpu->registers.a = ~((a&d)|(~a&~d));
+  cpu->registers.a ^= cpu->registers.d;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
   flag_unset(&cpu->registers, FLAG_SUBTRACT);
@@ -517,9 +510,7 @@ void xor_d(Z80* cpu, Memory* memory) {
 }
 
 void xor_e(Z80* cpu, Memory* memory) {
-  unsigned char a = cpu->registers.a;
-  unsigned char e = cpu->registers.e;
-  cpu->registers.a = ~((a&e)|(~a&~e));
+  cpu->registers.a ^= cpu->registers.e;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
   flag_unset(&cpu->registers, FLAG_SUBTRACT);
@@ -528,9 +519,7 @@ void xor_e(Z80* cpu, Memory* memory) {
 }
 
 void xor_h(Z80* cpu, Memory* memory) {
-  unsigned char a = cpu->registers.a;
-  unsigned char h = cpu->registers.h;
-  cpu->registers.a = ~((a&h)|(~a&~h));
+  cpu->registers.a ^= cpu->registers.h;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
   flag_unset(&cpu->registers, FLAG_SUBTRACT);
@@ -539,9 +528,7 @@ void xor_h(Z80* cpu, Memory* memory) {
 }
 
 void xor_l(Z80* cpu, Memory* memory) {
-  unsigned char a = cpu->registers.a;
-  unsigned char l = cpu->registers.l;
-  cpu->registers.a = ~((a&l)|(~a&~l));
+  cpu->registers.a ^= cpu->registers.l;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
   flag_unset(&cpu->registers, FLAG_SUBTRACT);
@@ -550,9 +537,7 @@ void xor_l(Z80* cpu, Memory* memory) {
 }
 
 void xor_hl(Z80* cpu, Memory* memory) {
-  unsigned char a = cpu->registers.a;
-  unsigned short hl = cpu->registers.hl;
-  cpu->registers.a ^= hl;
+  cpu->registers.a ^= cpu->registers.hl;
   cpu->clock.cycles += 8;
   flag_test_zero(&cpu->registers, cpu->registers.a);
   flag_unset(&cpu->registers, FLAG_SUBTRACT);
