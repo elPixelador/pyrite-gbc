@@ -23,7 +23,7 @@ void unloadMemory(Memory** mem)
   *mem = NULL;
 }
 
-void loadROM(const char* fileName)
+char* loadROM(const char* fileName)
 {
   char ch;
   char* curIndex;
@@ -59,6 +59,8 @@ void loadROM(const char* fileName)
 
   if(fp)
     fprintf(stderr," ERROR: Failed to close %s\n", fileName);
+
+  return rom;
 }
 
 char readbyte(Memory* mem, char addr)

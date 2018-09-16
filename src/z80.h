@@ -1,11 +1,11 @@
 #pragma once
 #include "memory.h"
 
-/* F Register flag defines */
-#define FLAG_CARRY      0x10
-#define FLAG_HALF_CARRY 0x20
-#define FLAG_OP         0x40
-#define FLAG_ZERO       0x80
+/* Flag register definitions */
+#define FLAG_ZERO       0x1
+#define FLAG_SUBTRACT   0x2
+#define FLAG_HALF_CARRY 0x4
+#define FLAG_CARRY      0x8
 
 typedef struct Registers
 {
@@ -56,13 +56,14 @@ typedef struct Z80
 {
   Registers registers;
   Clock clock;
-  Memory* memory;
 } Z80;
 
 Z80* createCPU();
-void unloadCPU(Z80* cpu);
+void unloadCPU(Z80** cpu);
 
-void run(Z80* cpu, const char* rom);
+void run(Z80* cpu, Memory* memory, const char* rom);
 
-/* Gameboy Instruction Set */
-void (*instruction)(Z80* cpu);
+// Z80 Instruction set
+void nop(Z80* cpu, Memory* memory);
+
+void inc_a(Z80* cpu, Memory* memory);

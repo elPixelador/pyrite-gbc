@@ -2,6 +2,8 @@
 
 #define MEMORY_SIZE 0xFFFF
 
+#define ROM_BANK_0 0x3FFF
+
 /* Starting Addresses for key locations in memory. */
 #define INTERRUPT_RST       0x000
 #define ROM_DATA            0x100
@@ -21,14 +23,14 @@
 
 typedef struct Memory
 {
-  char data[MEMORY_SIZE];
+  unsigned char data[MEMORY_SIZE];
 } Memory;
 
 Memory* createMemory();
 void unloadMemory(Memory** mem);
 
 /* Loads a rom into a special data store*/
-void loadROM(const char* fileName);
+char* loadROM(const char* fileName);
 
 /* Returns one byte of data starting from the address passed in contained within
    the memory structure pointer. */
