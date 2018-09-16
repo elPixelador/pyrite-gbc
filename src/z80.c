@@ -2,10 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void not_yet_implemented(unsigned char instr) {
-  printf("Error: 0x%X not found in opcode switch \n", instr & 0xff);
-}
-
 Z80* createCPU() {
   Z80* cpu = malloc(sizeof(Z80));
 
@@ -30,20 +26,21 @@ void unloadCPU(Z80** cpu) {
   *cpu = NULL;
 }
 
+void inline not_yet_implemented(unsigned char instr) {
+  printf("Error: 0x%X not found in opcode switch \n", instr & 0xff);
+}
+
 void run(Z80* cpu, Memory* memory, const char* file) 
 {
   // Load a rom
   char* romPtr = loadROM(file);
 
-  // Copy the first 0x3FFF data from the cartridge
-  // and load it into our memory for execution.
+  // Copy main cartridge bank into gb memory for execution
   memcpy(memory->data, romPtr, ROM_BANK_0+1);
 
   while(cpu->registers.pc < ROM_BANK_0) // Short term, avoid overflow by only executing loaded data
   {
     unsigned char instr = memory->data[cpu->registers.pc++];
-
-    printf("Instruction value = 0x%X, Program Counter = %d\n", instr & 0xff , cpu->registers.pc - 1 );
 
     // To better understand which instructions I'm yet to implement. I've
     // coded the entire instruction set into the switch with a not yet implemented
@@ -63,7 +60,7 @@ void run(Z80* cpu, Memory* memory, const char* file)
       case 0x0A: not_yet_implemented(instr); break;
       case 0x0B: not_yet_implemented(instr); break;
       case 0x0C: not_yet_implemented(instr); break;
-      case 0x0D: not_yet_implemented(instr); break;
+      case 0x0D: dec_c(cpu, memory);         break;
       case 0x0E: not_yet_implemented(instr); break;
       case 0x0F: not_yet_implemented(instr); break;
       case 0x10: not_yet_implemented(instr); break;
@@ -168,7 +165,7 @@ void run(Z80* cpu, Memory* memory, const char* file)
       case 0x73: not_yet_implemented(instr); break;
       case 0x74: not_yet_implemented(instr); break;
       case 0x75: not_yet_implemented(instr); break;
-      case 0x76: not_yet_implemented(instr); break;
+      case 0x76: halt(cpu, memory);          break;
       case 0x77: not_yet_implemented(instr); break;
       case 0x78: not_yet_implemented(instr); break;
       case 0x79: not_yet_implemented(instr); break;
@@ -234,18 +231,18 @@ void run(Z80* cpu, Memory* memory, const char* file)
       case 0xB5: not_yet_implemented(instr); break;
       case 0xB6: not_yet_implemented(instr); break;
       case 0xB7: not_yet_implemented(instr); break;
-      case 0xB8: not_yet_implemented(instr); break;
-      case 0xB9: not_yet_implemented(instr); break;
-      case 0xBA: not_yet_implemented(instr); break;
-      case 0xBB: not_yet_implemented(instr); break;
-      case 0xBC: not_yet_implemented(instr); break;
-      case 0xBD: not_yet_implemented(instr); break;
-      case 0xBE: not_yet_implemented(instr); break;
-      case 0xBF: not_yet_implemented(instr); break;
+      case 0xB8: cp_b(cpu, memory);          break;
+      case 0xB9: cp_c(cpu, memory);          break;
+      case 0xBA: cp_d(cpu, memory);          break;
+      case 0xBB: cp_e(cpu, memory);          break;
+      case 0xBC: cp_h(cpu, memory);          break;
+      case 0xBD: cp_l(cpu, memory);          break;
+      case 0xBE: cp_hl(cpu, memory);         break;
+      case 0xBF: cp_a(cpu, memory);          break;
       case 0xC0: not_yet_implemented(instr); break;
       case 0xC1: not_yet_implemented(instr); break;
       case 0xC2: not_yet_implemented(instr); break;
-      case 0xC3: not_yet_implemented(instr); break;
+      case 0xC3: jp_a16(cpu, memory);        break;
       case 0xC4: not_yet_implemented(instr); break;
       case 0xC5: not_yet_implemented(instr); break;
       case 0xC6: not_yet_implemented(instr); break;
@@ -337,6 +334,12 @@ void inline flag_unset(Registers* registers, unsigned char flag) {
 //
 
 void nop(Z80* cpu, Memory* memory) {
+  cpu->clock.cycles += 4;
+  return;
+}
+
+void halt(Z80* cpu, Memory* memory) {
+  cpu->clock.cycles += 4;
   return;
 }
 
@@ -346,16 +349,125 @@ void nop(Z80* cpu, Memory* memory) {
 
 void ret(Z80* cpu, Memory* memory) {
   // TODO
+  cpu->clock.cycles += 16;
+}
+
+void jp_a16(Z80* cpu, Memory* memory) {
+  // Read 2 bytes into 16 bits each to avoid truncation
+  unsigned short a = memory->data[cpu->registers.pc++];
+  unsigned short b = memory->data[cpu->registers.pc++];
+  cpu->registers.pc = (b << 8) | a;
+  cpu->clock.cycles += 16;
 }
 
 //
 // Increment Instructions
 //
 
-// Increment the value of register A
 void inc_a(Z80* cpu, Memory* memory) {
-  cpu->registers.a += 1;
+  cpu->registers.a++;
+  cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
   flag_unset(&cpu->registers, FLAG_SUBTRACT);
   flag_test_half_carry(&cpu->registers, cpu->registers.a, 1);
+}
+
+void dec_c(Z80* cpu, Memory* memory) {
+  cpu->registers.c--;
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, cpu->registers.a);
+  flag_set(&cpu->registers, FLAG_SUBTRACT);
+  flag_test_half_carry(&cpu->registers, cpu->registers.a, 1);
+}
+
+//
+// 8bit arithmetic/logical instructions
+//
+
+void cp_a(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  unsigned char result = a - a;
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, result);
+  flag_set(&cpu->registers, FLAG_SUBTRACT);
+  flag_test_half_carry(&cpu->registers, a, a);
+  flag_test_carry(&cpu->registers, result);
+}
+
+void cp_b(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  unsigned char b = cpu->registers.b;
+  char result = a - b;
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, result);
+  flag_set(&cpu->registers, FLAG_SUBTRACT);
+  flag_test_half_carry(&cpu->registers, a, b);
+  flag_test_carry(&cpu->registers, result);
+}
+
+void cp_c(Z80* cpu, Memory* memory)
+{
+  unsigned char a = cpu->registers.a;
+  unsigned char c = cpu->registers.c;
+  char result = a - c;
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, result);
+  flag_set(&cpu->registers, FLAG_SUBTRACT);
+  flag_test_half_carry(&cpu->registers, a, c);
+  flag_test_carry(&cpu->registers, result);
+}
+
+void cp_d(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  unsigned char d = cpu->registers.d;
+  char result = a - d;
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, result);
+  flag_set(&cpu->registers, FLAG_SUBTRACT);
+  flag_test_half_carry(&cpu->registers, a, d);
+  flag_test_carry(&cpu->registers, result);
+}
+
+void cp_e(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  unsigned char e = cpu->registers.e;
+  char result = a - e;
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, result);
+  flag_set(&cpu->registers, FLAG_SUBTRACT);
+  flag_test_half_carry(&cpu->registers, a, e);
+  flag_test_carry(&cpu->registers, result);
+}
+
+void cp_h(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  unsigned char h = cpu->registers.h;
+  char result = a - h;
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, result);
+  flag_set(&cpu->registers, FLAG_SUBTRACT);
+  flag_test_half_carry(&cpu->registers, a, h);
+  flag_test_carry(&cpu->registers, result);
+}
+
+void cp_l(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  unsigned char l = cpu->registers.l;
+  char result = a - l;
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, result);
+  flag_set(&cpu->registers, FLAG_SUBTRACT);
+  flag_test_half_carry(&cpu->registers, a, l);
+  flag_test_carry(&cpu->registers, result);
+}
+
+void cp_hl(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  unsigned short hl = cpu->registers.hl;
+  char result = a - hl;
+  cpu->clock.cycles += 8;
+  flag_test_zero(&cpu->registers, result);
+  flag_set(&cpu->registers, FLAG_SUBTRACT);
+  flag_test_half_carry(&cpu->registers, a, hl);
+  flag_test_carry(&cpu->registers, result);
 }

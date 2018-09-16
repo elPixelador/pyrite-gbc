@@ -32,18 +32,7 @@ void unloadMemory(Memory** mem);
 /* Loads a rom into a special data store*/
 char* loadROM(const char* fileName);
 
-/* Returns one byte of data starting from the address passed in contained within
-   the memory structure pointer. */
-char readByte(Memory* mem, char addr);
-
-/* Writes one byte of data starting from the address passed in contained within
-   the memory structure pointer. */
-void writeByte(Memory* mem, char addr, char byte);
-
-/* Returns one word of data (16 bytes) starting from the address passed in contained within
-   the memory structure pointer. */
-char readWord(Memory* mem, char addr);
-
-/* Writes one word of data (16 bytes) starting from the address passed in contained within
-   the memory structure pointer. */
-void writeWord(Memory* mem, char addr, short byte);
+unsigned char readByte(Memory* mem, unsigned short addr);
+unsigned short readWord(Memory* mem, unsigned short addr);
+void writeByte(Memory* mem, unsigned short addr, unsigned char byte);
+void writeWord(Memory* mem, unsigned short addr, unsigned short byte);

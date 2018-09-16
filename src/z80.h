@@ -48,8 +48,8 @@ typedef struct Registers
 
 typedef struct Clock
 {
-  char m, t;
-  char last_m, last_t;
+  unsigned short cycles;
+  unsigned short last_cycles;
 } Clock;
 
 typedef struct Z80
@@ -65,5 +65,19 @@ void run(Z80* cpu, Memory* memory, const char* rom);
 
 // Z80 Instruction set
 void nop(Z80* cpu, Memory* memory);
+void halt(Z80* cpu, Memory* memory);
+
+void ret(Z80* cpu, Memory* memory);
+void jp_a16(Z80* cpu, Memory* memory);
 
 void inc_a(Z80* cpu, Memory* memory);
+void dec_c(Z80* cpu, Memory* memory);
+
+void cp_a(Z80* cpu, Memory* memory);
+void cp_b(Z80* cpu, Memory* memory);
+void cp_c(Z80* cpu, Memory* memory);
+void cp_d(Z80* cpu, Memory* memory);
+void cp_e(Z80* cpu, Memory* memory);
+void cp_h(Z80* cpu, Memory* memory);
+void cp_l(Z80* cpu, Memory* memory);
+void cp_hl(Z80* cpu, Memory* memory);
