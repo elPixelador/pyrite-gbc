@@ -16,10 +16,6 @@ int main(int argc, char **argv)
 
   run(cpu, memory, argv[1]);
 
-  printf("Execution complete!\n");
-  printf("Press Enter to Continue\n");  
-  getchar();   
-
   unloadCPU(&cpu);
   unloadMemory(&memory);
 
