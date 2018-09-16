@@ -1,10 +1,2 @@
-CC=gcc
-CFLAGS=-I.
-DEPS = main.c z80.h memory.h
-OBJ = z80.o memory.o 
-
-%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
-
-hellomake: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+pyrite: src/main.c src/z80.c src/memory.c
+     gcc -o pyrite src/main.c src/z80.c src/memory.c -I.
