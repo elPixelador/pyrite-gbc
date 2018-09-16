@@ -81,3 +81,12 @@ void cp_e(Z80* cpu, Memory* memory);
 void cp_h(Z80* cpu, Memory* memory);
 void cp_l(Z80* cpu, Memory* memory);
 void cp_hl(Z80* cpu, Memory* memory);
+
+void xor_a(Z80* cpu, Memory* memory);
+void xor_b(Z80* cpu, Memory* memory);
+void xor_c(Z80* cpu, Memory* memory);
+void xor_d(Z80* cpu, Memory* memory);
+void xor_e(Z80* cpu, Memory* memory);
+void xor_h(Z80* cpu, Memory* memory);
+void xor_l(Z80* cpu, Memory* memory);
+void xor_hl(Z80* cpu, Memory* memory);

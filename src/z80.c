@@ -1,5 +1,6 @@
 #include "z80.h"
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 Z80* createCPU() {
@@ -215,14 +216,14 @@ void run(Z80* cpu, Memory* memory, const char* file)
       case 0xA5: not_yet_implemented(instr); break;
       case 0xA6: not_yet_implemented(instr); break;
       case 0xA7: not_yet_implemented(instr); break;
-      case 0xA8: not_yet_implemented(instr); break;
-      case 0xA9: not_yet_implemented(instr); break;
-      case 0xAA: not_yet_implemented(instr); break;
-      case 0xAB: not_yet_implemented(instr); break;
-      case 0xAC: not_yet_implemented(instr); break;
-      case 0xAD: not_yet_implemented(instr); break;
-      case 0xAE: not_yet_implemented(instr); break;
-      case 0xAF: not_yet_implemented(instr); break;
+      case 0xA8: xor_b(cpu, memory);         break;
+      case 0xA9: xor_c(cpu, memory);         break;
+      case 0xAA: xor_d(cpu, memory);         break;
+      case 0xAB: xor_e(cpu, memory);         break;
+      case 0xAC: xor_f(cpu, memory);         break;
+      case 0xAD: xor_h(cpu, memory);         break;
+      case 0xAE: xor_hl(cpu, memory);        break;
+      case 0xAF: xor_a(cpu, memory);         break;
       case 0xB0: not_yet_implemented(instr); break;
       case 0xB1: not_yet_implemented(instr); break;
       case 0xB2: not_yet_implemented(instr); break;
@@ -470,4 +471,91 @@ void cp_hl(Z80* cpu, Memory* memory) {
   flag_set(&cpu->registers, FLAG_SUBTRACT);
   flag_test_half_carry(&cpu->registers, a, hl);
   flag_test_carry(&cpu->registers, result);
+}
+
+void xor_a(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  cpu->registers.a = ~((a&a)|(~a&~a));
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, cpu->registers.a);
+  flag_unset(&cpu->registers, FLAG_SUBTRACT);
+  flag_unset(&cpu->registers, FLAG_HALF_CARRY);
+  flag_unset(&cpu->registers, FLAG_CARRY);
+}
+
+void xor_b(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  unsigned char b = cpu->registers.b;
+  cpu->registers.a = ~((a&b)|(~a&~b));
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, cpu->registers.a);
+  flag_unset(&cpu->registers, FLAG_SUBTRACT);
+  flag_unset(&cpu->registers, FLAG_HALF_CARRY);
+  flag_unset(&cpu->registers, FLAG_CARRY);
+}
+
+void xor_c(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  unsigned char c = cpu->registers.c;
+  cpu->registers.a = ~((a&c)|(~a&~c));
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, cpu->registers.a);
+  flag_unset(&cpu->registers, FLAG_SUBTRACT);
+  flag_unset(&cpu->registers, FLAG_HALF_CARRY);
+  flag_unset(&cpu->registers, FLAG_CARRY);
+}
+
+void xor_d(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  unsigned char d = cpu->registers.d;
+  cpu->registers.a = ~((a&d)|(~a&~d));
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, cpu->registers.a);
+  flag_unset(&cpu->registers, FLAG_SUBTRACT);
+  flag_unset(&cpu->registers, FLAG_HALF_CARRY);
+  flag_unset(&cpu->registers, FLAG_CARRY);
+}
+
+void xor_e(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  unsigned char e = cpu->registers.e;
+  cpu->registers.a = ~((a&e)|(~a&~e));
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, cpu->registers.a);
+  flag_unset(&cpu->registers, FLAG_SUBTRACT);
+  flag_unset(&cpu->registers, FLAG_HALF_CARRY);
+  flag_unset(&cpu->registers, FLAG_CARRY);
+}
+
+void xor_h(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  unsigned char h = cpu->registers.h;
+  cpu->registers.a = ~((a&h)|(~a&~h));
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, cpu->registers.a);
+  flag_unset(&cpu->registers, FLAG_SUBTRACT);
+  flag_unset(&cpu->registers, FLAG_HALF_CARRY);
+  flag_unset(&cpu->registers, FLAG_CARRY);
+}
+
+void xor_l(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  unsigned char l = cpu->registers.l;
+  cpu->registers.a = ~((a&l)|(~a&~l));
+  cpu->clock.cycles += 4;
+  flag_test_zero(&cpu->registers, cpu->registers.a);
+  flag_unset(&cpu->registers, FLAG_SUBTRACT);
+  flag_unset(&cpu->registers, FLAG_HALF_CARRY);
+  flag_unset(&cpu->registers, FLAG_CARRY);
+}
+
+void xor_hl(Z80* cpu, Memory* memory) {
+  unsigned char a = cpu->registers.a;
+  unsigned short hl = cpu->registers.hl;
+  cpu->registers.a ^= hl;
+  cpu->clock.cycles += 8;
+  flag_test_zero(&cpu->registers, cpu->registers.a);
+  flag_unset(&cpu->registers, FLAG_SUBTRACT);
+  flag_unset(&cpu->registers, FLAG_HALF_CARRY);
+  flag_unset(&cpu->registers, FLAG_CARRY);
 }
