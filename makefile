@@ -15,6 +15,8 @@ LDLIBS += -lm
 
 all: $(EXE)
 
+mkdir obj
+
 $(EXE): $(OBJ)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
