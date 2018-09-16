@@ -272,7 +272,7 @@ void run(Z80* cpu, Memory* memory, const char* file)
       case 0xDD:                             break;
       case 0xDE: not_yet_implemented(instr); break;
       case 0xDF: not_yet_implemented(instr); break;
-      case 0xE0: not_yet_implemented(instr); break;
+      case 0xE0: ldh_a8_A(cpu, memory);      break;
       case 0xE1: not_yet_implemented(instr); break;
       case 0xE2: not_yet_implemented(instr); break;
       case 0xE3:                             break;
@@ -288,7 +288,7 @@ void run(Z80* cpu, Memory* memory, const char* file)
       case 0xED:                             break;
       case 0xEE: not_yet_implemented(instr); break;
       case 0xEF: not_yet_implemented(instr); break;
-      case 0xF0: not_yet_implemented(instr); break;
+      case 0xF0: ldh_A_a8(cpu, memory);      break;
       case 0xF1: not_yet_implemented(instr); break;
       case 0xF2: not_yet_implemented(instr); break;
       case 0xF3: not_yet_implemented(instr); break;
@@ -340,6 +340,7 @@ void nop(Z80* cpu, Memory* memory) {
 }
 
 void halt(Z80* cpu, Memory* memory) {
+  // TODO
   cpu->clock.cycles += 4;
   return;
 }
@@ -349,7 +350,8 @@ void halt(Z80* cpu, Memory* memory) {
 //
 
 void ret(Z80* cpu, Memory* memory) {
-  // TODO
+  readWord(memory, cpu->registers.sp);
+  cpu->registers.sp += 2;
   cpu->clock.cycles += 16;
 }
 

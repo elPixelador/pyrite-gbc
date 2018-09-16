@@ -3,6 +3,9 @@
         "stdlib.h": "c",
         "memory.h": "c",
         "stdio.h": "c",
-        "z80.h": "c"
+        "z80.h": "c",
+        "glfw3.h": "c",
+        "glfw3.h\u0000glfw3.h": "c",
+        "glfw3.h\u0000lfw3.h": "c"
     }
 }
