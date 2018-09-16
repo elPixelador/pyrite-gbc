@@ -2,9 +2,4 @@ language: c
 compiler:
   - clang
   - gcc
-jobs:  
-  include:
-    - stage: "Functionality Tests"
-      script: ./unit-tests
-    - script: ./integration-tests   
-      name: "Integration Tests" 
+script: make
