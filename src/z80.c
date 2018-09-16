@@ -544,3 +544,15 @@ void xor_hl(Z80* cpu, Memory* memory) {
   flag_unset(&cpu->registers, FLAG_HALF_CARRY);
   flag_unset(&cpu->registers, FLAG_CARRY);
 }
+
+void ldh_A_a8(Z80* cpu, Memory* memory) {
+  unsigned char n = memory->data[cpu->registers.pc++];
+  cpu->registers.a = memory->data[0xFF00 + n];
+  cpu->clock.cycles += 12;
+}
+
+void ldh_a8_A(Z80* cpu, Memory* memory) {
+  unsigned char n = memory->data[cpu->registers.pc++];
+  memory->data[0xFF00 + n] = cpu->registers.a;
+  cpu->clock.cycles += 12;
+}

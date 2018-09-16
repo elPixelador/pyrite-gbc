@@ -90,3 +90,6 @@ void xor_e(Z80* cpu, Memory* memory);
 void xor_h(Z80* cpu, Memory* memory);
 void xor_l(Z80* cpu, Memory* memory);
 void xor_hl(Z80* cpu, Memory* memory);
+
+void ldh_A_a8(Z80* cpu, Memory* memory);
+void ldh_a8_A(Z80* cpu, Memory* memory);
