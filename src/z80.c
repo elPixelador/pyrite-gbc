@@ -310,6 +310,10 @@ void run(Z80* cpu, Memory* memory, const char* file)
   return;
 }
 
+//
+// Flag operations
+//
+
 void flag_test_zero(Registers* registers, unsigned char val) {
   if(val == 0x00) registers->f |= FLAG_ZERO;
 }
