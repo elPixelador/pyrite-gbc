@@ -35,7 +35,7 @@ void unloadCPU(Z80** cpu) {
   *cpu = NULL;
 }
 
-void inline not_yet_implemented(unsigned char instr) {
+void not_yet_implemented(unsigned char instr) {
   printf("Error: 0x%X not found in opcode switch \n", instr & 0xff);
 }
 
@@ -353,22 +353,28 @@ void process_interrupts(Z80* cpu) {
 }
 
 void inline flag_test_zero(Registers* registers, unsigned char val) {
+
+//
+// Flag operations
+//
+
+void flag_test_zero(Registers* registers, unsigned char val) {
   if(val == 0x00) registers->f |= FLAG_ZERO;
 }
 
-void inline flag_test_half_carry(Registers* registers, char a, char b) {
+void flag_test_half_carry(Registers* registers, char a, char b) {
   if((((a & 0xf) + (b & 0xf)) & 0x10) == 0x10) registers->f |= FLAG_HALF_CARRY;
 }
 
-void inline flag_test_carry(Registers* registers, unsigned char val) {
+void flag_test_carry(Registers* registers, unsigned char val) {
   if(val < 0) registers->f |= FLAG_CARRY;
 }
 
-void inline flag_set(Registers* registers, unsigned char flag) {
+void flag_set(Registers* registers, unsigned char flag) {
   registers->f |= flag;
 }
 
-void inline flag_unset(Registers* registers, unsigned char flag) {
+void flag_unset(Registers* registers, unsigned char flag) {
   registers->f &= ~flag;
 }
 
