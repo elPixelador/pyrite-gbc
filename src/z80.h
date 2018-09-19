@@ -74,7 +74,7 @@ void unloadCPU(Z80** cpu);
 
 void run(Z80* cpu, Memory* memory, const char* rom);
 
-void process_interrupts(Z80* cpu);
+void process_interrupts(Z80* cpu, Memory* memory);
 
 // Z80 Instruction set
 void nop(Z80* cpu, Memory* memory);

@@ -314,13 +314,13 @@ void run(Z80* cpu, Memory* memory, const char* file) {
       default: printf("Error: Unexpected instruction 0x%X \n", instr & 0xff);
     }
 
-    process_interrupts(cpu);
+    process_interrupts(cpu, memory);
 
   }
   return;
 }
 
-void process_interrupts(Z80* cpu) {
+void process_interrupts(Z80* cpu, Memory* memory) {
 
   if(!cpu->IME) {
     return;
@@ -328,31 +328,55 @@ void process_interrupts(Z80* cpu) {
 
   // Vertical blank
   if(cpu->IE & INTERRUPT_VERTICAL_BLANKING) {
+    cpu->IF |= INTERRUPT_VERTICAL_BLANKING;
+    cpu->IME = 0;
+    char data = memory->data[cpu->registers.pc];
+    writeWord(memory, cpu->registers.sp, readWord(memory, cpu->registers.pc));
+    cpu->registers.sp += 2;
+    cpu->registers.pc = 0x0040;
     return;
   }
 
   // LCDC status interrupt
   if(cpu->IE & INTERRUPT_LCDC) {
+    cpu->IF |= INTERRUPT_LCDC;
+    cpu->IME = 0;
+    writeWord(memory, cpu->registers.sp, readWord(memory, cpu->registers.pc));
+    cpu->registers.sp += 2;
+    cpu->registers.pc = 0x0048;
     return;
   }
 
   // Timer overflow
   if(cpu->IE & INTERRUPT_TIMER_OVERFLOW) {
+    cpu->IF |= INTERRUPT_TIMER_OVERFLOW;
+    cpu->IME = 0;
+    writeWord(memory, cpu->registers.sp, readWord(memory, cpu->registers.pc));
+    cpu->registers.sp += 2;
+    cpu->registers.pc = 0x0050;
     return;
   }
 
   // Serial transfer completion
   if(cpu->IE & INTERRUPT_SERIAL_TRANSFER_COMPLETE) {
+    cpu->IF |= INTERRUPT_SERIAL_TRANSFER_COMPLETE;
+    cpu->IME = 0;
+    writeWord(memory, cpu->registers.sp, readWord(memory, cpu->registers.pc));
+    cpu->registers.sp += 2;
+    cpu->registers.pc = 0x0058;
     return;
   }
 
   // P10-P13 input signal goes low
   if(cpu->IE & INTERRUPT_P10_P13_NEGATIVE_EDGE) {
+    cpu->IF |= INTERRUPT_P10_P13_NEGATIVE_EDGE;
+    cpu->IME = 0;
+    writeWord(memory, cpu->registers.sp, readWord(memory, cpu->registers.pc));
+    cpu->registers.sp += 2;
+    cpu->registers.pc = 0x0060;
     return;
   }
 }
-
-void inline flag_test_zero(Registers* registers, unsigned char val) {
 
 //
 // Flag operations
