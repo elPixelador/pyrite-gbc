@@ -330,7 +330,6 @@ void process_interrupts(Z80* cpu, Memory* memory) {
   if(cpu->IE & INTERRUPT_VERTICAL_BLANKING) {
     cpu->IF |= INTERRUPT_VERTICAL_BLANKING;
     cpu->IME = 0;
-    char data = memory->data[cpu->registers.pc];
     writeWord(memory, cpu->registers.sp, readWord(memory, cpu->registers.pc));
     cpu->registers.sp += 2;
     cpu->registers.pc = 0x0040;
