@@ -41,8 +41,8 @@ typedef struct Registers
     unsigned short hl;
   };
 
-  unsigned short sp;
-  unsigned short pc;
+  unsigned short sp; // Stack pointer
+  unsigned short pc; // Program counter
 
 } Registers;
 
@@ -56,6 +56,11 @@ typedef struct Z80
 {
   Registers registers;
   Clock clock;
+
+  unsigned char IE; // Interrupt enable
+  unsigned char IF; // Interrupt request
+  int IME; // Interrupt master enable
+
 } Z80;
 
 Z80* createCPU();

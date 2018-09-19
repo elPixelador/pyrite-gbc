@@ -17,6 +17,13 @@ Z80* createCPU() {
   cpu->registers.sp = 0;
   cpu->registers.pc = 0;
 
+  cpu->IE = 0;
+  cpu->IF = 0;
+  cpu->IME = 0;
+
+  cpu->clock.cycles = 0;
+  cpu->clock.last_cycles = 0;
+
   return cpu;
 }
 
