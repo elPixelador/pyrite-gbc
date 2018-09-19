@@ -68,10 +68,9 @@ unsigned char readByte(Memory* mem, unsigned short addr) {
 }
 
 unsigned short readWord(Memory* mem, unsigned short addr) {
-  // Have I mixed up order of a and b?
   unsigned short a = mem->data[addr];
   unsigned short b = mem->data[addr+1];
-  return (a << 8) | b;
+  return a | (b << 8);
 }
 
 void writeByte(Memory* mem, unsigned short addr, unsigned char byte) {
