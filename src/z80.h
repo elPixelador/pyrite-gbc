@@ -7,6 +7,12 @@
 #define FLAG_HALF_CARRY 0x4
 #define FLAG_CARRY      0x8
 
+#define INTERRUPT_VERTICAL_BLANKING         0x1
+#define INTERRUPT_LCDC                      0x2
+#define INTERRUPT_TIMER_OVERFLOW            0x4
+#define INTERRUPT_SERIAL_TRANSFER_COMPLETE  0x8
+#define INTERRUPT_P10_P13_NEGATIVE_EDGE     0x16
+
 typedef struct Registers
 {
   union{
@@ -67,6 +73,8 @@ Z80* createCPU();
 void unloadCPU(Z80** cpu);
 
 void run(Z80* cpu, Memory* memory, const char* rom);
+
+void process_interrupts(Z80* cpu);
 
 // Z80 Instruction set
 void nop(Z80* cpu, Memory* memory);

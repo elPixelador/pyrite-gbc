@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 Z80* createCPU() {
+
   Z80* cpu = malloc(sizeof(Z80));
 
   if(!cpu)
@@ -38,16 +39,15 @@ void inline not_yet_implemented(unsigned char instr) {
   printf("Error: 0x%X not found in opcode switch \n", instr & 0xff);
 }
 
-void run(Z80* cpu, Memory* memory, const char* file) 
-{
+void run(Z80* cpu, Memory* memory, const char* file) {
   // Load a rom
   char* romPtr = loadROM(file);
 
   // Copy main cartridge bank into gb memory for execution
   memcpy(memory->data, romPtr, ROM_BANK_0+1);
 
-  while(cpu->registers.pc < ROM_BANK_0) // Short term, avoid overflow by only executing loaded data
-  {
+  // Short term, avoid overflow by only executing loaded data
+  while(cpu->registers.pc < ROM_BANK_0) { 
     unsigned char instr = memory->data[cpu->registers.pc++];
 
     // To better understand which instructions I'm yet to implement. I've
@@ -313,8 +313,43 @@ void run(Z80* cpu, Memory* memory, const char* file)
       case 0xFF: not_yet_implemented(instr); break;
       default: printf("Error: Unexpected instruction 0x%X \n", instr & 0xff);
     }
+
+    process_interrupts(cpu);
+
   }
   return;
+}
+
+void process_interrupts(Z80* cpu) {
+
+  if(!cpu->IME) {
+    return;
+  }
+
+  // Vertical blank
+  if(cpu->IE & INTERRUPT_VERTICAL_BLANKING) {
+    return;
+  }
+
+  // LCDC status interrupt
+  if(cpu->IE & INTERRUPT_LCDC) {
+    return;
+  }
+
+  // Timer overflow
+  if(cpu->IE & INTERRUPT_TIMER_OVERFLOW) {
+    return;
+  }
+
+  // Serial transfer completion
+  if(cpu->IE & INTERRUPT_SERIAL_TRANSFER_COMPLETE) {
+    return;
+  }
+
+  // P10-P13 input signal goes low
+  if(cpu->IE & INTERRUPT_P10_P13_NEGATIVE_EDGE) {
+    return;
+  }
 }
 
 void inline flag_test_zero(Registers* registers, unsigned char val) {
