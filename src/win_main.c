@@ -174,16 +174,17 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			running = 1;
 			while (running)
 			{
-				LPMSG message;
-				BOOL messageResult = GetMessage(&message, 0, 0, 0);
-				if (messageResult > 0)
+				MSG msg;
+
+				while(PeekMessage(&msg,0, 0, 0, PM_REMOVE))
 				{
-					TranslateMessage(&message);
-					DispatchMessage(&message);
-				}
-				else
-				{
-					// Log
+					if(msg.message == WM_QUIT)
+					{
+						running = 0;
+					}
+
+					TranslateMessage(&msg);
+					DispatchMessage(&msg);
 				}
 			};
 		}
