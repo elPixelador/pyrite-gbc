@@ -67,42 +67,42 @@ typedef struct Z80
   unsigned char IF; // Interrupt request
   int IME; // Interrupt master enable
 
-} Z80;
+} CPU;
 
-Z80* createCPU();
-void unloadCPU(Z80** cpu);
+CPU* createCPU();
+void unloadCPU(CPU** cpu);
 
-void run(Z80* cpu, Memory* memory, const char* rom);
+void run(CPU* cpu, Memory* memory, const char* rom);
 
-void process_interrupts(Z80* cpu, Memory* memory);
+void process_interrupts(CPU* cpu, Memory* memory);
 
 // Z80 Instruction set
-void nop(Z80* cpu, Memory* memory);
-void halt(Z80* cpu, Memory* memory);
+void nop(CPU* cpu, Memory* memory);
+void halt(CPU* cpu, Memory* memory);
 
-void ret(Z80* cpu, Memory* memory);
-void jp_a16(Z80* cpu, Memory* memory);
+void ret(CPU* cpu, Memory* memory);
+void jp_a16(CPU* cpu, Memory* memory);
 
-void inc_a(Z80* cpu, Memory* memory);
-void dec_c(Z80* cpu, Memory* memory);
+void inc_a(CPU* cpu, Memory* memory);
+void dec_c(CPU* cpu, Memory* memory);
 
-void cp_a(Z80* cpu, Memory* memory);
-void cp_b(Z80* cpu, Memory* memory);
-void cp_c(Z80* cpu, Memory* memory);
-void cp_d(Z80* cpu, Memory* memory);
-void cp_e(Z80* cpu, Memory* memory);
-void cp_h(Z80* cpu, Memory* memory);
-void cp_l(Z80* cpu, Memory* memory);
-void cp_hl(Z80* cpu, Memory* memory);
+void cp_a(CPU* cpu, Memory* memory);
+void cp_b(CPU* cpu, Memory* memory);
+void cp_c(CPU* cpu, Memory* memory);
+void cp_d(CPU* cpu, Memory* memory);
+void cp_e(CPU* cpu, Memory* memory);
+void cp_h(CPU* cpu, Memory* memory);
+void cp_l(CPU* cpu, Memory* memory);
+void cp_hl(CPU* cpu, Memory* memory);
 
-void xor_a(Z80* cpu, Memory* memory);
-void xor_b(Z80* cpu, Memory* memory);
-void xor_c(Z80* cpu, Memory* memory);
-void xor_d(Z80* cpu, Memory* memory);
-void xor_e(Z80* cpu, Memory* memory);
-void xor_h(Z80* cpu, Memory* memory);
-void xor_l(Z80* cpu, Memory* memory);
-void xor_hl(Z80* cpu, Memory* memory);
+void xor_a(CPU* cpu, Memory* memory);
+void xor_b(CPU* cpu, Memory* memory);
+void xor_c(CPU* cpu, Memory* memory);
+void xor_d(CPU* cpu, Memory* memory);
+void xor_e(CPU* cpu, Memory* memory);
+void xor_h(CPU* cpu, Memory* memory);
+void xor_l(CPU* cpu, Memory* memory);
+void xor_hl(CPU* cpu, Memory* memory);
 
-void ldh_A_a8(Z80* cpu, Memory* memory);
-void ldh_a8_A(Z80* cpu, Memory* memory);
+void ldh_A_a8(CPU* cpu, Memory* memory);
+void ldh_a8_A(CPU* cpu, Memory* memory);

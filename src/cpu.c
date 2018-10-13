@@ -1,11 +1,11 @@
-#include "z80.h"
+#include "cpu.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-Z80* createCPU() {
+CPU* createCPU() {
 
-  Z80* cpu = malloc(sizeof(Z80));
+  CPU* cpu = malloc(sizeof(CPU));
 
   if(!cpu)
     fprintf(stderr, "ERROR: Failed to allocate memory for CPU\n");
@@ -28,7 +28,7 @@ Z80* createCPU() {
   return cpu;
 }
 
-void unloadCPU(Z80** cpu) {
+void unloadCPU(CPU** cpu) {
   if(*cpu)
     free(*cpu);
 
@@ -39,7 +39,7 @@ void not_yet_implemented(unsigned char instr) {
   printf("Error: 0x%X not found in opcode switch \n", instr & 0xff);
 }
 
-void run(Z80* cpu, Memory* memory, const char* file) {
+void run(CPU* cpu, Memory* memory, const char* file) {
   // Load a rom
   char* romPtr = loadROM(file);
 
@@ -320,7 +320,7 @@ void run(Z80* cpu, Memory* memory, const char* file) {
   return;
 }
 
-void process_interrupts(Z80* cpu, Memory* memory) {
+void process_interrupts(CPU* cpu, Memory* memory) {
 
   if(!cpu->IME) {
     return;
@@ -405,12 +405,12 @@ void flag_unset(Registers* registers, unsigned char flag) {
 // Misc Instructions
 //
 
-void nop(Z80* cpu, Memory* memory) {
+void nop(CPU* cpu, Memory* memory) {
   cpu->clock.cycles += 4;
   return;
 }
 
-void halt(Z80* cpu, Memory* memory) {
+void halt(CPU* cpu, Memory* memory) {
   // TODO
   cpu->clock.cycles += 4;
   return;
@@ -420,13 +420,13 @@ void halt(Z80* cpu, Memory* memory) {
 // Jumps & Calls
 //
 
-void ret(Z80* cpu, Memory* memory) {
+void ret(CPU* cpu, Memory* memory) {
   readWord(memory, cpu->registers.sp);
   cpu->registers.sp += 2;
   cpu->clock.cycles += 16;
 }
 
-void jp_a16(Z80* cpu, Memory* memory) {
+void jp_a16(CPU* cpu, Memory* memory) {
   // Read 2 bytes into 16 bits each to avoid truncation
   unsigned short a = memory->data[cpu->registers.pc++];
   unsigned short b = memory->data[cpu->registers.pc++];
@@ -438,7 +438,7 @@ void jp_a16(Z80* cpu, Memory* memory) {
 // Increment Instructions
 //
 
-void inc_a(Z80* cpu, Memory* memory) {
+void inc_a(CPU* cpu, Memory* memory) {
   cpu->registers.a++;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
@@ -446,7 +446,7 @@ void inc_a(Z80* cpu, Memory* memory) {
   flag_test_half_carry(&cpu->registers, cpu->registers.a, 1);
 }
 
-void dec_c(Z80* cpu, Memory* memory) {
+void dec_c(CPU* cpu, Memory* memory) {
   cpu->registers.c--;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
@@ -458,7 +458,7 @@ void dec_c(Z80* cpu, Memory* memory) {
 // 8bit arithmetic/logical instructions
 //
 
-void cp_a(Z80* cpu, Memory* memory) {
+void cp_a(CPU* cpu, Memory* memory) {
   unsigned char a = cpu->registers.a;
   unsigned char result = a - a;
   cpu->clock.cycles += 4;
@@ -468,7 +468,7 @@ void cp_a(Z80* cpu, Memory* memory) {
   flag_test_carry(&cpu->registers, result);
 }
 
-void cp_b(Z80* cpu, Memory* memory) {
+void cp_b(CPU* cpu, Memory* memory) {
   unsigned char a = cpu->registers.a;
   unsigned char b = cpu->registers.b;
   char result = a - b;
@@ -479,7 +479,7 @@ void cp_b(Z80* cpu, Memory* memory) {
   flag_test_carry(&cpu->registers, result);
 }
 
-void cp_c(Z80* cpu, Memory* memory)
+void cp_c(CPU* cpu, Memory* memory)
 {
   unsigned char a = cpu->registers.a;
   unsigned char c = cpu->registers.c;
@@ -491,7 +491,7 @@ void cp_c(Z80* cpu, Memory* memory)
   flag_test_carry(&cpu->registers, result);
 }
 
-void cp_d(Z80* cpu, Memory* memory) {
+void cp_d(CPU* cpu, Memory* memory) {
   unsigned char a = cpu->registers.a;
   unsigned char d = cpu->registers.d;
   char result = a - d;
@@ -502,7 +502,7 @@ void cp_d(Z80* cpu, Memory* memory) {
   flag_test_carry(&cpu->registers, result);
 }
 
-void cp_e(Z80* cpu, Memory* memory) {
+void cp_e(CPU* cpu, Memory* memory) {
   unsigned char a = cpu->registers.a;
   unsigned char e = cpu->registers.e;
   char result = a - e;
@@ -513,7 +513,7 @@ void cp_e(Z80* cpu, Memory* memory) {
   flag_test_carry(&cpu->registers, result);
 }
 
-void cp_h(Z80* cpu, Memory* memory) {
+void cp_h(CPU* cpu, Memory* memory) {
   unsigned char a = cpu->registers.a;
   unsigned char h = cpu->registers.h;
   char result = a - h;
@@ -524,7 +524,7 @@ void cp_h(Z80* cpu, Memory* memory) {
   flag_test_carry(&cpu->registers, result);
 }
 
-void cp_l(Z80* cpu, Memory* memory) {
+void cp_l(CPU* cpu, Memory* memory) {
   unsigned char a = cpu->registers.a;
   unsigned char l = cpu->registers.l;
   char result = a - l;
@@ -535,7 +535,7 @@ void cp_l(Z80* cpu, Memory* memory) {
   flag_test_carry(&cpu->registers, result);
 }
 
-void cp_hl(Z80* cpu, Memory* memory) {
+void cp_hl(CPU* cpu, Memory* memory) {
   unsigned char a = cpu->registers.a;
   unsigned short hl = cpu->registers.hl;
   char result = a - hl;
@@ -546,7 +546,7 @@ void cp_hl(Z80* cpu, Memory* memory) {
   flag_test_carry(&cpu->registers, result);
 }
 
-void xor_a(Z80* cpu, Memory* memory) {
+void xor_a(CPU* cpu, Memory* memory) {
   cpu->registers.a ^= cpu->registers.a;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
@@ -555,7 +555,7 @@ void xor_a(Z80* cpu, Memory* memory) {
   flag_unset(&cpu->registers, FLAG_CARRY);
 }
 
-void xor_b(Z80* cpu, Memory* memory) {
+void xor_b(CPU* cpu, Memory* memory) {
   cpu->registers.a ^= cpu->registers.b;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
@@ -564,7 +564,7 @@ void xor_b(Z80* cpu, Memory* memory) {
   flag_unset(&cpu->registers, FLAG_CARRY);
 }
 
-void xor_c(Z80* cpu, Memory* memory) {
+void xor_c(CPU* cpu, Memory* memory) {
   cpu->registers.a ^= cpu->registers.c;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
@@ -573,7 +573,7 @@ void xor_c(Z80* cpu, Memory* memory) {
   flag_unset(&cpu->registers, FLAG_CARRY);
 }
 
-void xor_d(Z80* cpu, Memory* memory) {
+void xor_d(CPU* cpu, Memory* memory) {
   cpu->registers.a ^= cpu->registers.d;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
@@ -582,7 +582,7 @@ void xor_d(Z80* cpu, Memory* memory) {
   flag_unset(&cpu->registers, FLAG_CARRY);
 }
 
-void xor_e(Z80* cpu, Memory* memory) {
+void xor_e(CPU* cpu, Memory* memory) {
   cpu->registers.a ^= cpu->registers.e;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
@@ -591,7 +591,7 @@ void xor_e(Z80* cpu, Memory* memory) {
   flag_unset(&cpu->registers, FLAG_CARRY);
 }
 
-void xor_h(Z80* cpu, Memory* memory) {
+void xor_h(CPU* cpu, Memory* memory) {
   cpu->registers.a ^= cpu->registers.h;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
@@ -600,7 +600,7 @@ void xor_h(Z80* cpu, Memory* memory) {
   flag_unset(&cpu->registers, FLAG_CARRY);
 }
 
-void xor_l(Z80* cpu, Memory* memory) {
+void xor_l(CPU* cpu, Memory* memory) {
   cpu->registers.a ^= cpu->registers.l;
   cpu->clock.cycles += 4;
   flag_test_zero(&cpu->registers, cpu->registers.a);
@@ -609,7 +609,7 @@ void xor_l(Z80* cpu, Memory* memory) {
   flag_unset(&cpu->registers, FLAG_CARRY);
 }
 
-void xor_hl(Z80* cpu, Memory* memory) {
+void xor_hl(CPU* cpu, Memory* memory) {
   cpu->registers.a ^= cpu->registers.hl;
   cpu->clock.cycles += 8;
   flag_test_zero(&cpu->registers, cpu->registers.a);
@@ -618,13 +618,13 @@ void xor_hl(Z80* cpu, Memory* memory) {
   flag_unset(&cpu->registers, FLAG_CARRY);
 }
 
-void ldh_A_a8(Z80* cpu, Memory* memory) {
+void ldh_A_a8(CPU* cpu, Memory* memory) {
   unsigned char n = memory->data[cpu->registers.pc++];
   cpu->registers.a = memory->data[0xFF00 + n];
   cpu->clock.cycles += 12;
 }
 
-void ldh_a8_A(Z80* cpu, Memory* memory) {
+void ldh_a8_A(CPU* cpu, Memory* memory) {
   unsigned char n = memory->data[cpu->registers.pc++];
   memory->data[0xFF00 + n] = cpu->registers.a;
   cpu->clock.cycles += 12;
