@@ -1,3 +1,5 @@
+#ifdef _WIN32
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <windows.h>
@@ -18,7 +20,8 @@ static int bitmapHeight;
 
 static void resizeDIBSection(int width, int height)
 {
-	if(bitmapMemory) {
+	if (bitmapMemory)
+	{
 		VirtualFree(bitmapMemory, 0, MEM_RELEASE);
 	}
 
@@ -36,27 +39,27 @@ static void resizeDIBSection(int width, int height)
 	int bitmapMemorySize = (bitmapWidth * bitmapHeight) * bytesPerPixel;
 	bitmapMemory = VirtualAlloc(0, bitmapMemorySize, MEM_COMMIT, PAGE_READWRITE);
 
-	int pitch = width*bytesPerPixel;
-	uint8* row = (uint8*)bitmapMemory;
-	for(int y = 0; y < bitmapHeight; ++y) 
-	{	
-		uint8 *pixel = (uint8*) row;
-		for(int x = 0; x < bitmapWidth; ++x) 
+	int pitch = width * bytesPerPixel;
+	uint8 *row = (uint8 *)bitmapMemory;
+	for (int y = 0; y < bitmapHeight; ++y)
+	{
+		uint8 *pixel = (uint8 *)row;
+		for (int x = 0; x < bitmapWidth; ++x)
 		{
 			*pixel = (uint8)x;
 			++pixel;
-			*pixel = (uint8)y; 
+			*pixel = (uint8)y;
 			++pixel;
-			*pixel = 0; 
+			*pixel = 0;
 			++pixel;
-			*pixel = 0; 
+			*pixel = 0;
 			++pixel;
 		}
 		row += pitch;
 	}
 }
 
-static void renderWindow(HDC ctx, RECT* windowRect, int x, int y, int width, int height)
+static void renderWindow(HDC ctx, RECT *windowRect, int x, int y, int width, int height)
 {
 
 	int windowWidth = windowRect->right - windowRect->left;
@@ -69,8 +72,7 @@ static void renderWindow(HDC ctx, RECT* windowRect, int x, int y, int width, int
 		bitmapMemory,
 		&bitmapInfo,
 		DIB_RGB_COLORS,
-		SRCCOPY
-	);
+		SRCCOPY);
 }
 
 LRESULT CALLBACK WindowCallback(
@@ -193,3 +195,5 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	return EXIT_SUCCESS;
 }
+
+#endif
