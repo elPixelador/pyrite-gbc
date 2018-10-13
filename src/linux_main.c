@@ -1,5 +1,5 @@
 #ifdef __linux__
-void main(int argc, const char *argv)
+int main(int argc, char** argv)
 {
     return 0;
 }
