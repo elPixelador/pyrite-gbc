@@ -35,4 +35,6 @@
 # Anything else
 *.pdb
 *.ilk
+bin/*
+obj/*
 
