@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <shellapi.h>
 #include <stdint.h>
+#include <gl/gl.h>
 
 typedef uint8_t uint8;
 typedef uint16_t uint16;
@@ -17,6 +18,37 @@ static BITMAPINFO bitmapInfo;
 static void *bitmapMemory;
 static int bitmapWidth;
 static int bitmapHeight;
+
+static void Win32InitOpenGL(HWND hwnd) 
+{
+	HDC windowDC = GetDC(hwnd);
+
+	PIXELFORMATDESCRIPTOR requestedPixelFormat = {0};
+	requestedPixelFormat.nSize = sizeof(requestedPixelFormat);
+	requestedPixelFormat.nVersion = 1;
+	requestedPixelFormat.dwFlags = PFD_SUPPORT_OPENGL|PFD_DRAW_TO_WINDOW|PFD_DOUBLEBUFFER;
+	requestedPixelFormat.cColorBits = 24;
+	requestedPixelFormat.cAlphaBits = 8;
+	requestedPixelFormat.iLayerType = PFD_MAIN_PLANE;
+
+	int suggestedFormatIndex = ChoosePixelFormat(windowDC, &requestedPixelFormat);
+	PIXELFORMATDESCRIPTOR suggestedFormat;
+	DescribePixelFormat(windowDC, suggestedFormatIndex, sizeof(suggestedFormat), &suggestedFormat);
+	SetPixelFormat(windowDC, suggestedFormatIndex, &suggestedFormat);
+
+	HGLRC openGLRC = wglCreateContext(windowDC);
+
+	if(wglMakeCurrent(windowDC, openGLRC))
+	{
+		// success
+	}
+	else 
+	{
+		// err
+	}
+	
+	ReleaseDC(hwnd, windowDC);
+}
 
 static void resizeDIBSection(int width, int height)
 {
@@ -59,20 +91,15 @@ static void resizeDIBSection(int width, int height)
 	}
 }
 
-static void renderWindow(HDC ctx, RECT *windowRect, int x, int y, int width, int height)
+static void Win32RenderWindow(HDC ctx, RECT *windowRect, int x, int y, int width, int height)
 {
-
 	int windowWidth = windowRect->right - windowRect->left;
 	int windowHeight = windowRect->bottom - windowRect->top;
 
-	StretchDIBits(
-		ctx,
-		0, 0, bitmapWidth, bitmapHeight,
-		0, 0, windowWidth, windowHeight,
-		bitmapMemory,
-		&bitmapInfo,
-		DIB_RGB_COLORS,
-		SRCCOPY);
+	glViewport(0, 0, windowWidth, windowHeight);
+	glClearColor(0.7f, 0.4f, 0.1f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	SwapBuffers(ctx);
 }
 
 LRESULT CALLBACK WindowCallback(
@@ -128,7 +155,7 @@ LRESULT CALLBACK WindowCallback(
 		RECT rect;
 		GetClientRect(hwnd, &rect);
 
-		renderWindow(deviceCtx, &rect, x, y, width, height);
+		Win32RenderWindow(deviceCtx, &rect, x, y, width, height);
 		EndPaint(hwnd, &paint);
 	}
 	break;
@@ -171,7 +198,10 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 		if (windowHandle)
 		{
+			Win32InitOpenGL(windowHandle);
+
 			running = 1;
+
 			while (running)
 			{
 				MSG msg;

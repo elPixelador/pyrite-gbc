@@ -11,11 +11,6 @@
                 "kind": "build",
                 "isDefault": true
             }
-        },
-        {
-            "label": "Launch Executable",
-            "type": "shell",
-            "command": "bin/pyrite.exe",
         }
     ]
 }

@@ -7,6 +7,6 @@ mkdir bin
 mkdir obj
 
 set src=src/win_main.c src/emulator.c src/memory.c src/cpu.c
-set libs=user32.lib Shell32.lib Gdi32.lib
+set libs=user32.lib Gdi32.lib opengl32.lib
 
 cl /Od /EHsc /Fo:obj\ %src% %libs% /link /out:bin\pyrite.exe /Subsystem:WINDOWS
