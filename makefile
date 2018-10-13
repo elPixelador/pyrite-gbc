@@ -16,11 +16,11 @@ LDLIBS += -lm
 all: $(EXE)
 
 $(EXE): $(OBJ)
-	@mkdir -p $(SRC_DIR)
+	mkdir -p $(@D)
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
+	mkdir -p $(@D)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
 clean:
