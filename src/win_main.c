@@ -148,7 +148,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	WNDCLASS windowClass = {0};
 
-	windowClass.style = CS_HREDRAW | CS_VREDRAW;
+	windowClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	windowClass.lpfnWndProc = WindowCallback;
 	windowClass.hInstance = hInstance;
 	windowClass.lpszClassName = "PyriteWindowClass";
