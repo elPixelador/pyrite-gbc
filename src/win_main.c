@@ -77,7 +77,7 @@ static void Win32RenderBuffer(HDC ctx, RECT* windowRect, int x, int y, int width
 	// Render test
 	glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-    glOrtho(0.0f, width, height, 0.0f, 0.0f, 1.0f);
+    glOrtho(0, 1, 1, 0, -1, 1 );
     glMatrixMode( GL_MODELVIEW );
     glLoadIdentity();
     glColor3f( 1, 1, 1 );
