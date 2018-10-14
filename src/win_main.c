@@ -19,13 +19,7 @@ static void *bitmapMemory;
 static int bitmapWidth;
 static int bitmapHeight;
 
-static GLfloat pixels[] =
-{
-    1, 0, 0,
-    0, 1, 0,
-    0, 0, 1,
-    1, 1, 1
-};
+static GLfloat pixels[144 * 160 * 3] = {0}; // width * height * (R,G,B) per pixel
 
 GLuint texid[] = { -1 };
 
@@ -52,10 +46,15 @@ static void Win32InitOpenGL(HWND hwnd)
 	HGLRC openGLRC = wglCreateContext(windowDC);
 	if (wglMakeCurrent(windowDC, openGLRC))
 	{
+		for(int i = 0; i < 144 * 160 * 3; ++i) 
+		{
+			pixels[i] = 0.00001f * i;
+		}
+
 		glEnable( GL_TEXTURE_2D );
     	glGenTextures( 1, texid );
     	glBindTexture( GL_TEXTURE_2D, texid[ 0 ] );
-    	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels );
+    	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 144, 160, 0, GL_RGB, GL_FLOAT, pixels );
     	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	}
