@@ -19,6 +19,16 @@ static void *bitmapMemory;
 static int bitmapWidth;
 static int bitmapHeight;
 
+static GLfloat pixels[] =
+{
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1,
+    1, 1, 1
+};
+
+GLuint texid[] = { -1 };
+
 static void Win32InitOpenGL(HWND hwnd)
 {
 	HDC windowDC = GetDC(hwnd);
@@ -42,7 +52,12 @@ static void Win32InitOpenGL(HWND hwnd)
 	HGLRC openGLRC = wglCreateContext(windowDC);
 	if (wglMakeCurrent(windowDC, openGLRC))
 	{
-		// success
+		glEnable( GL_TEXTURE_2D );
+    	glGenTextures( 1, texid );
+    	glBindTexture( GL_TEXTURE_2D, texid[ 0 ] );
+    	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels );
+    	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	}
 	else
 	{
@@ -52,14 +67,33 @@ static void Win32InitOpenGL(HWND hwnd)
 	ReleaseDC(hwnd, windowDC);
 }
 
-static void Win32RenderBuffer(HDC ctx, RECT *windowRect, int x, int y, int width, int height)
+static void Win32RenderBuffer(HDC ctx, RECT* windowRect, int x, int y, int width, int height)
 {
-	int windowWidth = windowRect->right - windowRect->left;
-	int windowHeight = windowRect->bottom - windowRect->top;
-
+	// Clear buffer
 	glViewport(0, 0, width, height);
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Render test
+	glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+    glOrtho(0.0f, width, height, 0.0f, 0.0f, 1.0f);
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity();
+    glColor3f( 1, 1, 1 );
+    glBindTexture( GL_TEXTURE_2D, texid[ 0 ] );
+    glBegin( GL_QUADS );
+    glTexCoord2f( 0, 0 );
+    glVertex2f( 0, 0 );
+    glTexCoord2f( 1, 0 );
+    glVertex2f( 1, 0 );
+    glTexCoord2f( 1, 1 );
+    glVertex2f( 1, 1 );
+    glTexCoord2f( 0, 1 );
+    glVertex2f( 0, 1 );
+    glEnd();
+
+	// Swap back buffer
 	SwapBuffers(ctx);
 }
 
