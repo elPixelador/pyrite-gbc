@@ -19,85 +19,46 @@ static void *bitmapMemory;
 static int bitmapWidth;
 static int bitmapHeight;
 
-static void Win32InitOpenGL(HWND hwnd) 
+static void Win32InitOpenGL(HWND hwnd)
 {
 	HDC windowDC = GetDC(hwnd);
 
+	// We describe the buffer format we would "like" from the system
 	PIXELFORMATDESCRIPTOR requestedPixelFormat = {0};
 	requestedPixelFormat.nSize = sizeof(requestedPixelFormat);
 	requestedPixelFormat.nVersion = 1;
-	requestedPixelFormat.dwFlags = PFD_SUPPORT_OPENGL|PFD_DRAW_TO_WINDOW|PFD_DOUBLEBUFFER;
+	requestedPixelFormat.dwFlags = PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW | PFD_DOUBLEBUFFER;
 	requestedPixelFormat.cColorBits = 24;
 	requestedPixelFormat.cAlphaBits = 8;
 	requestedPixelFormat.iLayerType = PFD_MAIN_PLANE;
 
+	// The system could give us anything back, we basically have to accept what we're given.
 	int suggestedFormatIndex = ChoosePixelFormat(windowDC, &requestedPixelFormat);
 	PIXELFORMATDESCRIPTOR suggestedFormat;
 	DescribePixelFormat(windowDC, suggestedFormatIndex, sizeof(suggestedFormat), &suggestedFormat);
 	SetPixelFormat(windowDC, suggestedFormatIndex, &suggestedFormat);
 
+	// create our OpenGL context
 	HGLRC openGLRC = wglCreateContext(windowDC);
-
-	if(wglMakeCurrent(windowDC, openGLRC))
+	if (wglMakeCurrent(windowDC, openGLRC))
 	{
 		// success
 	}
-	else 
+	else
 	{
 		// err
 	}
-	
+
 	ReleaseDC(hwnd, windowDC);
 }
 
-static void resizeDIBSection(int width, int height)
-{
-	if (bitmapMemory)
-	{
-		VirtualFree(bitmapMemory, 0, MEM_RELEASE);
-	}
-
-	bitmapWidth = width;
-	bitmapHeight = height;
-
-	bitmapInfo.bmiHeader.biSize = sizeof(bitmapInfo.bmiHeader);
-	bitmapInfo.bmiHeader.biWidth = bitmapWidth;
-	bitmapInfo.bmiHeader.biHeight = -bitmapHeight;
-	bitmapInfo.bmiHeader.biPlanes = 1;
-	bitmapInfo.bmiHeader.biBitCount = 32;
-	bitmapInfo.bmiHeader.biCompression = BI_RGB;
-
-	int bytesPerPixel = 4;
-	int bitmapMemorySize = (bitmapWidth * bitmapHeight) * bytesPerPixel;
-	bitmapMemory = VirtualAlloc(0, bitmapMemorySize, MEM_COMMIT, PAGE_READWRITE);
-
-	int pitch = width * bytesPerPixel;
-	uint8 *row = (uint8 *)bitmapMemory;
-	for (int y = 0; y < bitmapHeight; ++y)
-	{
-		uint8 *pixel = (uint8 *)row;
-		for (int x = 0; x < bitmapWidth; ++x)
-		{
-			*pixel = (uint8)x;
-			++pixel;
-			*pixel = (uint8)y;
-			++pixel;
-			*pixel = 0;
-			++pixel;
-			*pixel = 0;
-			++pixel;
-		}
-		row += pitch;
-	}
-}
-
-static void Win32RenderWindow(HDC ctx, RECT *windowRect, int x, int y, int width, int height)
+static void Win32RenderBuffer(HDC ctx, RECT *windowRect, int x, int y, int width, int height)
 {
 	int windowWidth = windowRect->right - windowRect->left;
 	int windowHeight = windowRect->bottom - windowRect->top;
 
-	glViewport(0, 0, windowWidth, windowHeight);
-	glClearColor(0.7f, 0.4f, 0.1f, 0.0f);
+	glViewport(0, 0, width, height);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	SwapBuffers(ctx);
 }
@@ -112,16 +73,6 @@ LRESULT CALLBACK WindowCallback(
 
 	switch (uMsg)
 	{
-	case WM_SIZE:
-	{
-		RECT rect;
-		GetClientRect(hwnd, &rect);
-		int width = rect.right - rect.left;
-		int height = rect.bottom - rect.top;
-		resizeDIBSection(width, height);
-	}
-	break;
-
 	case WM_DESTROY:
 	{
 		running = 0;
@@ -155,7 +106,7 @@ LRESULT CALLBACK WindowCallback(
 		RECT rect;
 		GetClientRect(hwnd, &rect);
 
-		Win32RenderWindow(deviceCtx, &rect, x, y, width, height);
+		Win32RenderBuffer(deviceCtx, &rect, x, y, width, height);
 		EndPaint(hwnd, &paint);
 	}
 	break;
@@ -172,30 +123,31 @@ LRESULT CALLBACK WindowCallback(
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-
+	// Define a window to be created
 	WNDCLASS windowClass = {0};
-
 	windowClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	windowClass.lpfnWndProc = WindowCallback;
 	windowClass.hInstance = hInstance;
 	windowClass.lpszClassName = "PyriteWindowClass";
 
+	// Create the window
 	if (RegisterClass(&windowClass))
 	{
 		HWND windowHandle = CreateWindowEx(
 			0,
 			windowClass.lpszClassName,
 			"Pyrite",
-			WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+			WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
-			CW_USEDEFAULT,
-			CW_USEDEFAULT,
+			144 * 3,
+			160 * 3,
 			0,
 			0,
 			hInstance,
 			0);
 
+		// Setup render context & windows message handler
 		if (windowHandle)
 		{
 			Win32InitOpenGL(windowHandle);
@@ -206,9 +158,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			{
 				MSG msg;
 
-				while(PeekMessage(&msg,0, 0, 0, PM_REMOVE))
+				while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 				{
-					if(msg.message == WM_QUIT)
+					if (msg.message == WM_QUIT)
 					{
 						running = 0;
 					}
