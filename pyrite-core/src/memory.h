@@ -1,35 +1,37 @@
 #pragma once
+#include <string>
 
-constexpr auto MEMORY_SIZE = 0xFFFF;
-constexpr auto ROM_BANK_0 = 0x3FFF;
+/* Important regions in memory. */
 
-/* Starting Addresses for key locations in memory. */
+struct MemoryRegion {
+	uint16_t start;
+	uint16_t end;
+};
 
-constexpr auto INTERRUPT_RST =     0x0000;
-constexpr auto ROM_DATA =          0x1000;
-constexpr auto USER_PROG_AREA =    0x1500;
-constexpr auto BANK_CHAR_DATA =    0x8000;
-constexpr auto BG_DISPLAY_DATA_1 = 0x9800;
-constexpr auto BG_DISPLAY_DATA_2 = 0x9C00;
-constexpr auto EXTERN_EXPAC_RAM =  0xA000;
-constexpr auto BANK_0 =            0xC000;
-constexpr auto BANK_1_7 =          0xD000;
-constexpr auto PROHIBITED =        0xE000;
-constexpr auto OAM =               0xFE00;
-constexpr auto WTF_IS_THIS =       0xFEA0;
-constexpr auto OTHER_REGISTERS =   0xFF00;
-constexpr auto WORK_STACK_RAM =    0xFF80;
-constexpr auto UNUSED =            0xFFFE;
+constexpr MemoryRegion ROM0 =         { 0x0000, 0x3FFF }; // Non-switchable ROM
+constexpr MemoryRegion ROMX =         { 0x4000, 0x7FFF }; // Switchable ROM bank
+constexpr MemoryRegion VRAM =         { 0x8000, 0x9FFF }; // Video RAM, Switchable
+constexpr MemoryRegion SRAM =         { 0xA000, 0xBFFF }; // External RAM
+constexpr MemoryRegion WRAM0 =        { 0xC000, 0xCFFF }; // Work RAM
+constexpr MemoryRegion WRAMX =        { 0xD000, 0xDFFF }; // Work RAM, Switchable
+constexpr MemoryRegion ECHO =         { 0xE000, 0xFDFF }; // 
+constexpr MemoryRegion OAM =          { 0xFE00, 0xFE9F }; // Sprite information table
+constexpr MemoryRegion UNUSED =       { 0xFEA0, 0xFEFF }; // 
+constexpr MemoryRegion IO_REGISTERS = { 0xFF00, 0xFF7F }; // Input / Output registers
+constexpr MemoryRegion HRAM =         { 0xFF80, 0xFFFE }; // Internal CPU RAM
+constexpr MemoryRegion IE_REGISTERS = { 0xFFFF, 0xFFFF }; // Interupt enable flags
 
 class Memory {
 
-	unsigned char data[MEMORY_SIZE];
+	uint8_t data[0xFFFF];
 
 public:
 
-	unsigned char readByte(unsigned short addr);
-	unsigned short readWord(unsigned short addr);
-	void writeByte(unsigned short addr, unsigned char byte);
-	void writeWord(unsigned short addr, unsigned short byte);
+	void loadROM(std::string path);
+
+	uint8_t readByte(uint16_t addr);
+	uint16_t readWord(uint16_t addr);
+	void writeByte(uint16_t addr, uint8_t byte);
+	void writeWord(uint16_t addr, uint16_t byte);
 
 };

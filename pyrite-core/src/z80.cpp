@@ -1,15 +1,13 @@
 #include "z80.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <iostream>
 
-void not_yet_implemented(unsigned char instr) {
-	printf("Error: 0x%X not found in opcode switch \n", instr & 0xff);
+void not_yet_implemented(uint8_t instr) {
+	std::cerr << "Error: 0x" << instr << " not yet implemented" << std::endl;
 }
 
 void Z80::tick() {
 
-	unsigned char instr = this->memory.readByte(this->registers.pc++);
+	uint8_t instr = this->memory->readByte(this->registers.pc++);
 
 	switch (instr)
 	{
@@ -269,7 +267,7 @@ void Z80::tick() {
 	case 0xFD:                             break;
 	case 0xFE: not_yet_implemented(instr); break;
 	case 0xFF: not_yet_implemented(instr); break;
-	default: printf("Error: Unexpected instruction 0x%X \n", instr & 0xff);
+	default: std::cout << "Error: 0x" << instr << " not found in opcode switch" << std::endl;
 	}
 
 	process_interrupts();
@@ -286,7 +284,7 @@ void Z80::process_interrupts() {
 	if (this->IE & INTERRUPT_VERTICAL_BLANKING) {
 		this->IF |= INTERRUPT_VERTICAL_BLANKING;
 		this->IME = 0;
-		memory.writeWord(this->registers.sp, memory.readWord(this->registers.pc));
+		memory->writeWord(this->registers.sp, memory->readWord(this->registers.pc));
 		this->registers.sp += 2;
 		this->registers.pc = 0x0040;
 		return;
@@ -296,7 +294,7 @@ void Z80::process_interrupts() {
 	if (this->IE & INTERRUPT_LCDC) {
 		this->IF |= INTERRUPT_LCDC;
 		this->IME = 0;
-		memory.writeWord(this->registers.sp, memory.readWord(this->registers.pc));
+		memory->writeWord(this->registers.sp, memory->readWord(this->registers.pc));
 		this->registers.sp += 2;
 		this->registers.pc = 0x0048;
 		return;
@@ -306,7 +304,7 @@ void Z80::process_interrupts() {
 	if (this->IE & INTERRUPT_TIMER_OVERFLOW) {
 		this->IF |= INTERRUPT_TIMER_OVERFLOW;
 		this->IME = 0;
-		memory.writeWord(this->registers.sp, memory.readWord(this->registers.pc));
+		memory->writeWord(this->registers.sp, memory->readWord(this->registers.pc));
 		this->registers.sp += 2;
 		this->registers.pc = 0x0050;
 		return;
@@ -316,7 +314,7 @@ void Z80::process_interrupts() {
 	if (this->IE & INTERRUPT_SERIAL_TRANSFER_COMPLETE) {
 		this->IF |= INTERRUPT_SERIAL_TRANSFER_COMPLETE;
 		this->IME = 0;
-		memory.writeWord(this->registers.sp, memory.readWord(this->registers.pc));
+		memory->writeWord(this->registers.sp, memory->readWord(this->registers.pc));
 		this->registers.sp += 2;
 		this->registers.pc = 0x0058;
 		return;
@@ -326,7 +324,7 @@ void Z80::process_interrupts() {
 	if (this->IE & INTERRUPT_P10_P13_NEGATIVE_EDGE) {
 		this->IF |= INTERRUPT_P10_P13_NEGATIVE_EDGE;
 		this->IME = 0;
-		memory.writeWord(this->registers.sp, memory.readWord(this->registers.pc));
+		memory->writeWord(this->registers.sp, memory->readWord(this->registers.pc));
 		this->registers.sp += 2;
 		this->registers.pc = 0x0060;
 		return;
@@ -337,23 +335,23 @@ void Z80::process_interrupts() {
 // Flag operations
 //
 
-void Z80::flag_test_zero(Registers* registers, unsigned char val) {
+void Z80::flag_test_zero(Registers* registers, uint8_t val) {
 	if (val == 0x00) registers->f |= FLAG_ZERO;
 }
 
-void Z80::flag_test_half_carry(Registers* registers, char a, char b) {
+void Z80::flag_test_half_carry(Registers* registers, int8_t a, int8_t b) {
 	if ((((a & 0xf) + (b & 0xf)) & 0x10) == 0x10) registers->f |= FLAG_HALF_CARRY;
 }
 
-void Z80::flag_test_carry(Registers* registers, unsigned char val) {
+void Z80::flag_test_carry(Registers* registers, uint8_t val) {
 	if (val < 0) registers->f |= FLAG_CARRY;
 }
 
-void Z80::flag_set(Registers* registers, unsigned char flag) {
+void Z80::flag_set(Registers* registers, uint8_t flag) {
 	registers->f |= flag;
 }
 
-void Z80::flag_unset(Registers* registers, unsigned char flag) {
+void Z80::flag_unset(Registers* registers, uint8_t flag) {
 	registers->f &= ~flag;
 }
 
@@ -377,15 +375,15 @@ void Z80::halt() {
 //
 
 void Z80::ret() {
-	memory.readWord(this->registers.sp);
+	memory->readWord(this->registers.sp);
 	this->registers.sp += 2;
 	this->clock.cycles += 16;
 }
 
 void Z80::jp_a16() {
 	// Read 2 bytes into 16 bits each to avoid truncation
-	unsigned short a = memory.readWord(this->registers.pc++);
-	unsigned short b = memory.readWord(this->registers.pc++);
+	uint16_t a = memory->readWord(this->registers.pc++);
+	uint16_t b = memory->readWord(this->registers.pc++);
 	this->registers.pc = (b << 8) | a;
 	this->clock.cycles += 16;
 }
@@ -415,8 +413,8 @@ void Z80::dec_c() {
 //
 
 void Z80::cp_a() {
-	unsigned char a = this->registers.a;
-	unsigned char result = a - a;
+	uint8_t a = this->registers.a;
+	uint8_t result = a - a;
 	this->clock.cycles += 4;
 	flag_test_zero(&this->registers, result);
 	flag_set(&this->registers, FLAG_SUBTRACT);
@@ -425,8 +423,8 @@ void Z80::cp_a() {
 }
 
 void Z80::cp_b() {
-	unsigned char a = this->registers.a;
-	unsigned char b = this->registers.b;
+	uint8_t a = this->registers.a;
+	uint8_t b = this->registers.b;
 	char result = a - b;
 	this->clock.cycles += 4;
 	flag_test_zero(&this->registers, result);
@@ -437,8 +435,8 @@ void Z80::cp_b() {
 
 void Z80::cp_c()
 {
-	unsigned char a = this->registers.a;
-	unsigned char c = this->registers.c;
+	uint8_t a = this->registers.a;
+	uint8_t c = this->registers.c;
 	char result = a - c;
 	this->clock.cycles += 4;
 	flag_test_zero(&this->registers, result);
@@ -448,8 +446,8 @@ void Z80::cp_c()
 }
 
 void Z80::cp_d() {
-	unsigned char a = this->registers.a;
-	unsigned char d = this->registers.d;
+	uint8_t a = this->registers.a;
+	uint8_t d = this->registers.d;
 	char result = a - d;
 	this->clock.cycles += 4;
 	flag_test_zero(&this->registers, result);
@@ -459,8 +457,8 @@ void Z80::cp_d() {
 }
 
 void Z80::cp_e() {
-	unsigned char a = this->registers.a;
-	unsigned char e = this->registers.e;
+	uint8_t a = this->registers.a;
+	uint8_t e = this->registers.e;
 	char result = a - e;
 	this->clock.cycles += 4;
 	flag_test_zero(&this->registers, result);
@@ -470,8 +468,8 @@ void Z80::cp_e() {
 }
 
 void Z80::cp_h() {
-	unsigned char a = this->registers.a;
-	unsigned char h = this->registers.h;
+	uint8_t a = this->registers.a;
+	uint8_t h = this->registers.h;
 	char result = a - h;
 	this->clock.cycles += 4;
 	flag_test_zero(&this->registers, result);
@@ -481,8 +479,8 @@ void Z80::cp_h() {
 }
 
 void Z80::cp_l() {
-	unsigned char a = this->registers.a;
-	unsigned char l = this->registers.l;
+	uint8_t a = this->registers.a;
+	uint8_t l = this->registers.l;
 	char result = a - l;
 	this->clock.cycles += 4;
 	flag_test_zero(&this->registers, result);
@@ -492,8 +490,8 @@ void Z80::cp_l() {
 }
 
 void Z80::cp_hl() {
-	unsigned char a = this->registers.a;
-	unsigned short hl = this->registers.hl;
+	uint8_t a = this->registers.a;
+	uint16_t hl = this->registers.hl;
 	char result = a - hl;
 	this->clock.cycles += 8;
 	flag_test_zero(&this->registers, result);
@@ -575,13 +573,13 @@ void Z80::xor_hl() {
 }
 
 void Z80::ldh_A_a8() {
-	unsigned char n = memory.readByte(this->registers.pc++);
-	this->registers.a = memory.readByte(0xFF00 + n);
+	uint8_t n = memory->readByte(this->registers.pc++);
+	this->registers.a = memory->readByte(0xFF00 + n);
 	this->clock.cycles += 12;
 }
 
 void Z80::ldh_a8_A() {
-	unsigned char n = memory.readByte(this->registers.pc++);
-	memory.writeByte(0xFF00 + n, this->registers.a);
+	uint8_t n = memory->readByte(this->registers.pc++);
+	memory->writeByte(0xFF00 + n, this->registers.a);
 	this->clock.cycles += 12;
 }

@@ -1,6 +1,6 @@
 
 set(HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/minunit.h)
-set(SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/unit_test.c)
+set(SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/unit_test.cpp)
 
 add_executable(pyrite-tests ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(pyrite-tests LINK_PUBLIC pyrite-core)

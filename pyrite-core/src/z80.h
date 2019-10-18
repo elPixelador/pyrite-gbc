@@ -17,45 +17,45 @@ struct Registers
 {
 	union {
 		struct {
-			unsigned char a;
-			unsigned char f;
+			uint8_t a;
+			uint8_t f;
 		};
-		unsigned short af = 0;
+		uint16_t af = 0;
 	};
 
 	union {
 		struct {
-			unsigned char b;
-			unsigned char c;
+			uint8_t b;
+			uint8_t c;
 		};
-		unsigned short bc = 0;
+		uint16_t bc = 0;
 	};
 
 	union {
 		struct {
-			unsigned char d;
-			unsigned char e;
+			uint8_t d;
+			uint8_t e;
 		};
-		unsigned short de = 0;
+		uint16_t de = 0;
 	};
 
 	union {
 		struct {
-			unsigned char h;
-			unsigned char l;
+			uint8_t h;
+			uint8_t l;
 		};
-		unsigned short hl = 0;
+		uint16_t hl = 0;
 	};
 
-	unsigned short sp = 0; // Stack pointer
-	unsigned short pc = 0; // Program counter
+	uint16_t sp = 0; // Stack pointer
+	uint16_t pc = 0; // Program counter
 
 };
 
 struct Clock
 {
-	unsigned short cycles = 0;
-	unsigned short last_cycles = 0;
+	uint16_t cycles = 0;
+	uint16_t last_cycles = 0;
 };
 
 class Z80
@@ -63,20 +63,19 @@ class Z80
 
 	Registers registers;
 	Clock clock;
-	Memory memory;
+	Memory* memory;
 
-	unsigned char IE = 0; // Interrupt enable
-	unsigned char IF = 0; // Interrupt request
-	int IME = 0;          // Interrupt master enable
+	uint8_t IE = 0; // Interrupt enable
+	uint8_t IF = 0; // Interrupt request
+	bool IME = false;     // Interrupt master enable
 
-	void tick();
 	void process_interrupts();
 
-	void flag_test_zero(Registers* registers, unsigned char val);
-	void flag_test_half_carry(Registers* registers, char a, char b);
-	void flag_test_carry(Registers* registers, unsigned char val);
-	void flag_set(Registers* registers, unsigned char flag);
-	void flag_unset(Registers* registers, unsigned char flag);
+	void flag_test_zero(Registers* registers, uint8_t val);
+	void flag_test_half_carry(Registers* registers, int8_t a, int8_t b);
+	void flag_test_carry(Registers* registers, uint8_t val);
+	void flag_set(Registers* registers, uint8_t flag);
+	void flag_unset(Registers* registers, uint8_t flag);
 
 	// Z80 Instruction set
 	void nop();
@@ -107,5 +106,17 @@ class Z80
 
 	void ldh_A_a8();
 	void ldh_a8_A();
+
+public:
+
+	void tick();
+
+	void connectMemory(Memory* memory) {
+		this->memory = memory;
+	}
+
+	Registers const* const getRegisters() const {
+		return &registers;
+	}
 
 };
