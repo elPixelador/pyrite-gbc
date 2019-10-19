@@ -1,17 +1,20 @@
 #pragma once
 #include "memory.h"
 
-/* Flag register definitions */
-constexpr auto FLAG_ZERO = 0x1;
-constexpr auto FLAG_SUBTRACT = 0x2;
-constexpr auto FLAG_HALF_CARRY = 0x4;
-constexpr auto FLAG_CARRY = 0x8;
+/* Available flags. These are set by instructions.  */
 
-constexpr auto INTERRUPT_VERTICAL_BLANKING = 0x1;
-constexpr auto INTERRUPT_LCDC = 0x2;
-constexpr auto INTERRUPT_TIMER_OVERFLOW = 0x4;
-constexpr auto INTERRUPT_SERIAL_TRANSFER_COMPLETE = 0x8;
-constexpr auto INTERRUPT_P10_P13_NEGATIVE_EDGE = 0x16;
+constexpr uint8_t FLAG_ZERO = 0x1;
+constexpr uint8_t FLAG_SUBTRACT = 0x2;
+constexpr uint8_t FLAG_HALF_CARRY = 0x4;
+constexpr uint8_t FLAG_CARRY = 0x8;
+
+/* Available interrupts. Cause the flow of the application to divert to certain important events such as rendering. */
+
+constexpr uint8_t INTERRUPT_VERTICAL_BLANKING = 0x1;
+constexpr uint8_t INTERRUPT_LCDC = 0x2;
+constexpr uint8_t INTERRUPT_TIMER_OVERFLOW = 0x4;
+constexpr uint8_t INTERRUPT_SERIAL_TRANSFER_COMPLETE = 0x8;
+constexpr uint8_t INTERRUPT_P10_P13_NEGATIVE_EDGE = 0x16;
 
 struct Registers
 {
@@ -55,7 +58,6 @@ struct Registers
 struct Clock
 {
 	uint16_t cycles = 0;
-	uint16_t last_cycles = 0;
 };
 
 class Z80
@@ -72,14 +74,14 @@ class Z80
 	void process_interrupts();
 
 	void flag_test_zero(Registers* registers, uint8_t val);
-	void flag_test_half_carry(Registers* registers, int8_t a, int8_t b);
+	void flag_test_half_carry(Registers* registers, int16_t a, int16_t b);
 	void flag_test_carry(Registers* registers, uint8_t val);
 	void flag_set(Registers* registers, uint8_t flag);
 	void flag_unset(Registers* registers, uint8_t flag);
 
 	// Z80 Instruction set
-	void nop();
-	void halt();
+	void nop();      // 0x00
+	void halt();     // 0x76
 
 	void ret();
 	void jp_a16();
@@ -103,6 +105,8 @@ class Z80
 	void xor_h();
 	void xor_l();
 	void xor_hl();
+
+	void ld_hl_d16(); // 0x21
 
 	void ldh_A_a8();
 	void ldh_a8_A();

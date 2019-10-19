@@ -2,7 +2,7 @@
 #include <iostream>
 
 void not_yet_implemented(uint8_t instr) {
-	std::cerr << "Error: 0x" << instr << " not yet implemented" << std::endl;
+	std::cerr << "Error: Instruction not yet implemented: 0x" << std::hex << static_cast<int>(instr) << std::endl;
 }
 
 void Z80::tick() {
@@ -44,7 +44,7 @@ void Z80::tick() {
 	case 0x1E: not_yet_implemented(instr); break;
 	case 0x1F: not_yet_implemented(instr); break;
 	case 0x20: not_yet_implemented(instr); break;
-	case 0x21: not_yet_implemented(instr); break;
+	case 0x21: ld_hl_d16();                break;
 	case 0x22: not_yet_implemented(instr); break;
 	case 0x23: not_yet_implemented(instr); break;
 	case 0x24: not_yet_implemented(instr); break;
@@ -336,15 +336,18 @@ void Z80::process_interrupts() {
 //
 
 void Z80::flag_test_zero(Registers* registers, uint8_t val) {
-	if (val == 0x00) registers->f |= FLAG_ZERO;
+	if (val == 0x00) 
+		registers->f |= FLAG_ZERO;
 }
 
-void Z80::flag_test_half_carry(Registers* registers, int8_t a, int8_t b) {
-	if ((((a & 0xf) + (b & 0xf)) & 0x10) == 0x10) registers->f |= FLAG_HALF_CARRY;
+void Z80::flag_test_half_carry(Registers* registers, int16_t a, int16_t b) {
+	if ((((a & 0xf) + (b & 0xf)) & 0x10) == 0x10) 
+		registers->f |= FLAG_HALF_CARRY;
 }
 
 void Z80::flag_test_carry(Registers* registers, uint8_t val) {
-	if (val < 0) registers->f |= FLAG_CARRY;
+	if (val < 0) 
+		registers->f |= FLAG_CARRY;
 }
 
 void Z80::flag_set(Registers* registers, uint8_t flag) {
@@ -582,4 +585,13 @@ void Z80::ldh_a8_A() {
 	uint8_t n = memory->readByte(this->registers.pc++);
 	memory->writeByte(0xFF00 + n, this->registers.a);
 	this->clock.cycles += 12;
+}
+
+//
+// 16bit load/store/move instructions
+//
+
+void Z80::ld_hl_d16() {
+	// TODO
+	uint8_t n = memory->readByte(this->registers.pc++);
 }

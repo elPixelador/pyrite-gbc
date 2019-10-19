@@ -12,15 +12,14 @@ uint8_t Memory::readByte(uint16_t addr) {
 }
 
 uint16_t Memory::readWord(uint16_t addr) {
-	uint16_t a = this->data[addr];
-	uint16_t b = this->data[addr+1];
-	return a | (b << 8);
+	return this->data[addr] | (this->data[addr + 1] << 8);
 }
 
 void Memory::writeByte(uint16_t addr, uint8_t byte) {
 	this->data[addr] = byte;
 }
 
-void Memory::writeWord(uint16_t addr, uint16_t byte) {
-	this->data[addr] = byte;
+void Memory::writeWord(uint16_t addr, uint16_t word) {
+	this->data[addr] = word & 0xff;
+	this->data[addr+1] = (word >> 8);
 }
