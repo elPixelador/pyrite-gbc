@@ -1,13 +1,20 @@
 #include "z80.h"
 #include <iostream>
 
-void not_yet_implemented(uint8_t instr) {
+void Z80::not_yet_implemented(uint8_t instr) {
 	std::cerr << "Error: Instruction not yet implemented: 0x" << std::hex << static_cast<int>(instr) << std::endl;
+	this->registers.pc--;
 }
 
 void Z80::tick() {
 
+	if (this->registers.pc == 0x2817) {
+		std::cout << "Loading gpu data" << std::endl;
+	}
+
 	uint8_t instr = this->memory->readByte(this->registers.pc++);
+
+	std::cout << "Next Instr: 0x" << std::hex << static_cast<int>(instr) << std::endl;
 
 	switch (instr)
 	{
@@ -27,23 +34,23 @@ void Z80::tick() {
 	case 0x0D: dec_c();                    break;
 	case 0x0E: ld_c_d8();                  break;
 	case 0x0F: rrca();                     break;
-	case 0x10: not_yet_implemented(instr); break;
-	case 0x11: not_yet_implemented(instr); break;
-	case 0x12: not_yet_implemented(instr); break;
-	case 0x13: not_yet_implemented(instr); break;
-	case 0x14: not_yet_implemented(instr); break;
-	case 0x15: not_yet_implemented(instr); break;
-	case 0x16: not_yet_implemented(instr); break;
-	case 0x17: not_yet_implemented(instr); break;
-	case 0x18: not_yet_implemented(instr); break;
-	case 0x19: not_yet_implemented(instr); break;
-	case 0x1A: not_yet_implemented(instr); break;
-	case 0x1B: not_yet_implemented(instr); break;
-	case 0x1C: not_yet_implemented(instr); break;
-	case 0x1D: not_yet_implemented(instr); break;
-	case 0x1E: not_yet_implemented(instr); break;
-	case 0x1F: not_yet_implemented(instr); break;
-	case 0x20: not_yet_implemented(instr); break;
+	case 0x10: stop_0();                   break;
+	case 0x11: ld_de_d16();                break;
+	case 0x12: ld_de_a();                  break;
+	case 0x13: inc_de();                   break;
+	case 0x14: inc_d();                    break;
+	case 0x15: dec_d();                    break;
+	case 0x16: ld_d_d8();                  break;
+	case 0x17: rla();                      break;
+	case 0x18: jr_r8();                    break;
+	case 0x19: add_hl_de();                break;
+	case 0x1A: ld_a_de();                  break;
+	case 0x1B: dec_de();                   break;
+	case 0x1C: inc_e();                    break;
+	case 0x1D: dec_e();                    break;
+	case 0x1E: ld_e_d8();                  break;
+	case 0x1F: rra();                      break;
+	case 0x20: jr_nz_r8(); break;
 	case 0x21: ld_hl_d16();                break;
 	case 0x22: not_yet_implemented(instr); break;
 	case 0x23: not_yet_implemented(instr); break;
@@ -61,7 +68,7 @@ void Z80::tick() {
 	case 0x2F: not_yet_implemented(instr); break;
 	case 0x30: not_yet_implemented(instr); break;
 	case 0x31: not_yet_implemented(instr); break;
-	case 0x32: not_yet_implemented(instr); break;
+	case 0x32: ld_hld_a();                 break;
 	case 0x33: not_yet_implemented(instr); break;
 	case 0x34: not_yet_implemented(instr); break;
 	case 0x35: not_yet_implemented(instr); break;
@@ -275,36 +282,37 @@ void Z80::tick() {
 }
 
 void Z80::nop() {
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	return;
 }
 
 void Z80::ld_bc_d16() {
-	this->registers.bc = this->memory->readWord(this->registers.pc++);
-	this->clock.cycles += 12;
+	this->registers.bc = this->memory->readWord(this->registers.pc);
+	this->registers.pc += 2;
+	this->clock.ticks += 12;
 }
 
 void Z80::ld_bc_a() {
 	this->memory->writeByte(this->registers.bc, this->registers.a);
-	this->clock.cycles += 8;
+	this->clock.ticks += 8;
 }
 
 void Z80::inc_bc() {
 	this->registers.bc++;
-	this->clock.cycles += 8;
+	this->clock.ticks += 8;
 }
 
 void Z80::inc_b() {
 	this->registers.b++;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(this->registers.b);
-	flag_unset(FLAG_SUBTRACT);
+	flag_reset(FLAG_SUBTRACT);
 	flag_test_half_carry(this->registers.b, 1);
 }
 
 void Z80::dec_b() {
 	this->registers.b--;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(this->registers.b);
 	flag_set(FLAG_SUBTRACT);
 	flag_test_half_carry(this->registers.b, 1);
@@ -312,7 +320,7 @@ void Z80::dec_b() {
 
 void Z80::ld_b_d8() {
 	this->registers.b = this->memory->readByte(this->registers.pc++);
-	this->clock.cycles += 8;
+	this->clock.ticks += 8;
 }
 
 void Z80::rlca() {
@@ -323,14 +331,14 @@ void Z80::rlca() {
 		this->registers.a |= 0x01;
 		flag_set(FLAG_CARRY);
 	}
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 }
 
 void Z80::ld_a16_sp() {
 	uint16_t addr = this->memory->readWord(this->registers.pc);
 	this->registers.pc += 2;
 	this->memory->writeWord(addr, this->registers.pc);
-	this->clock.cycles += 20;
+	this->clock.ticks += 20;
 }
 
 void Z80::add_hl_bc() {
@@ -338,30 +346,30 @@ void Z80::add_hl_bc() {
 	flag_set(FLAG_SUBTRACT);
 	flag_test_half_carry(this->registers.hl, 1);
 	flag_test_carry(this->registers.hl);
-	this->clock.cycles += 8;
+	this->clock.ticks += 8;
 }
 
 void Z80::ld_a_bc() {
 	this->registers.a = this->memory->readByte(this->registers.bc);
-	this->clock.cycles += 8;
+	this->clock.ticks += 8;
 }
 
 void Z80::dec_bc() {
 	this->registers.bc--;
-	this->clock.cycles += 8;
+	this->clock.ticks += 8;
 }
 
 void Z80::inc_c() {
 	this->registers.c++;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(this->registers.c);
-	flag_unset(FLAG_SUBTRACT);
+	flag_reset(FLAG_SUBTRACT);
 	flag_test_half_carry(this->registers.c, 1);
 }
 
 void Z80::dec_c() {
 	this->registers.c--;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(this->registers.c);
 	flag_set(FLAG_SUBTRACT);
 	flag_test_half_carry(this->registers.c, 1);
@@ -370,55 +378,188 @@ void Z80::dec_c() {
 void Z80::ld_c_d8() {
 	uint8_t data = this->memory->readByte(this->registers.pc++);
 	this->registers.c = data;
-	this->clock.cycles += 8;
+	this->clock.ticks += 8;
 }
 
 void Z80::rrca() {
-	uint8_t tmpA = this->registers.a;
 	this->registers.a >>= 1;
-	this->registers.f = 0;
-	if (tmpA & 0x01) {
-		this->registers.a |= 0x80;
-		flag_set(FLAG_CARRY);
-	}
-	this->clock.cycles += 4;
+	flag_reset(FLAG_ZERO);
+	flag_reset(FLAG_SUBTRACT);
+	flag_reset(FLAG_HALF_CARRY);
+	flag_test_carry(this->registers.a);
+	this->clock.ticks += 4;
 }
+
+void Z80::stop_0() {
+	// TODO
+	this->clock.ticks += 4;
+}
+
+void Z80::ld_de_d16() {
+	this->registers.de = this->memory->readWord(this->registers.pc);
+	this->registers.pc += 2;
+	this->clock.ticks += 12;
+}
+
+void Z80::ld_de_a() {
+	this->memory->writeByte(this->registers.de, this->registers.a);
+	this->clock.ticks += 8;
+}
+
+void Z80::inc_de() {
+	this->registers.de++;
+	this->clock.ticks += 8;
+}
+
+void Z80::inc_d() {
+	this->registers.d++;
+	this->clock.ticks += 4;
+	flag_test_zero(this->registers.d);
+	flag_reset(FLAG_SUBTRACT);
+	flag_test_half_carry(this->registers.d, 1);
+}
+
+void Z80::dec_d() {
+	this->registers.d--;
+	this->clock.ticks += 4;
+	flag_test_zero(this->registers.d);
+	flag_set(FLAG_SUBTRACT);
+	flag_test_half_carry(this->registers.d, 1);
+}
+
+void Z80::ld_d_d8() {
+	this->registers.d = this->memory->readByte(this->registers.pc++);
+	this->clock.ticks += 8;
+}
+
+void Z80::rla() {
+	this->registers.a <<= 1;
+	flag_reset(FLAG_ZERO);
+	flag_reset(FLAG_SUBTRACT);
+	flag_reset(FLAG_HALF_CARRY);
+	flag_test_carry(this->registers.a);
+	this->clock.ticks += 4;
+}
+
+void Z80::jr_r8() {
+	this->registers.pc += (int8_t)this->memory->readByte(this->registers.pc);
+	this->clock.ticks += 12;
+}
+
+void Z80::add_hl_de() {
+	this->registers.hl += this->registers.de;
+	flag_set(FLAG_SUBTRACT);
+	flag_test_half_carry(this->registers.hl, 1);
+	flag_test_carry(this->registers.hl);
+	this->clock.ticks += 8;
+}
+
+void Z80::ld_a_de() {
+	this->registers.a = this->memory->readByte(this->registers.de);
+	this->clock.ticks += 8;
+}
+
+void Z80::dec_de() {
+	this->registers.de--;
+	this->clock.ticks += 8;
+}
+
+void Z80::inc_e() {
+	this->registers.e++;
+	this->clock.ticks += 4;
+	flag_test_zero(this->registers.e);
+	flag_reset(FLAG_SUBTRACT);
+	flag_test_half_carry(this->registers.e, 1);
+}
+
+void Z80::dec_e() {
+	this->registers.e--;
+	this->clock.ticks += 4;
+	flag_test_zero(this->registers.e);
+	flag_set(FLAG_SUBTRACT);
+	flag_test_half_carry(this->registers.e, 1);
+}
+
+void Z80::ld_e_d8() {
+	uint8_t data = this->memory->readByte(this->registers.pc++);
+	this->registers.e = data;
+	this->clock.ticks += 8;
+}
+
+void Z80::rra() {
+	this->registers.a >>= 1;
+	flag_reset(FLAG_ZERO);
+	flag_reset(FLAG_SUBTRACT);
+	flag_reset(FLAG_HALF_CARRY);
+	flag_test_carry(this->registers.a);
+	this->clock.ticks += 4;
+}
+
+void Z80::jr_nz_r8() {
+	if (this->flag_check(OperationFlag::FLAG_ZERO)) {
+		int8_t data = (int8_t)memory->readByte(this->registers.pc);
+		this->registers.pc += data;
+		this->clock.ticks += 12;
+	} else {
+		this->clock.ticks += 8;
+	}
+}
+
+void Z80::ld_hl_d16() {
+	uint8_t data = memory->readWord(this->registers.pc);
+	this->registers.pc += 2;
+	this->registers.hl = data;
+	this->clock.ticks += 12;
+}
+
+void Z80::ld_hld_a() {
+	this->memory->writeByte(this->registers.hl, this->registers.a);
+	this->registers.hl--;
+	this->clock.ticks += 8;
+}
+
+void Z80::inc_a() {
+	this->registers.a++;
+	this->clock.ticks += 4;
+	flag_test_zero(this->registers.a);
+	flag_reset(FLAG_SUBTRACT);
+	flag_test_half_carry(this->registers.a, 1);
+}
+
+
+
+
+
+
+
+
+
+
+
+// Mess of unordered opcode funcs
 
 void Z80::halt() {
 	// TODO
-	this->clock.cycles += 4;
-	return;
+	this->clock.ticks += 4;
 }
 
 void Z80::ret() {
 	memory->readWord(this->registers.sp);
 	this->registers.sp += 2;
-	this->clock.cycles += 16;
+	this->clock.ticks += 16;
 }
 
 void Z80::jp_a16() {
 	// Read 2 bytes into 16 bits each to avoid truncation
 	uint16_t data = memory->readWord(this->registers.pc);
 	this->registers.pc = data;
-	this->clock.cycles += 16;
+	this->clock.ticks += 16;
 }
-
-void Z80::inc_a() {
-	this->registers.a++;
-	this->clock.cycles += 4;
-	flag_test_zero(this->registers.a);
-	flag_unset(FLAG_SUBTRACT);
-	flag_test_half_carry(this->registers.a, 1);
-}
-
-//
-// 8bit arithmetic/logical instructions
-//
 
 void Z80::cp_a() {
 	uint8_t a = this->registers.a;
 	uint8_t result = a - a;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(result);
 	flag_set(FLAG_SUBTRACT);
 	flag_test_half_carry(a, a);
@@ -429,7 +570,7 @@ void Z80::cp_b() {
 	uint8_t a = this->registers.a;
 	uint8_t b = this->registers.b;
 	char result = a - b;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero( result);
 	flag_set(FLAG_SUBTRACT);
 	flag_test_half_carry(a, b);
@@ -441,7 +582,7 @@ void Z80::cp_c()
 	uint8_t a = this->registers.a;
 	uint8_t c = this->registers.c;
 	char result = a - c;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(result);
 	flag_set(FLAG_SUBTRACT);
 	flag_test_half_carry(a, c);
@@ -452,7 +593,7 @@ void Z80::cp_d() {
 	uint8_t a = this->registers.a;
 	uint8_t d = this->registers.d;
 	char result = a - d;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(result);
 	flag_set(FLAG_SUBTRACT);
 	flag_test_half_carry(a, d);
@@ -463,7 +604,7 @@ void Z80::cp_e() {
 	uint8_t a = this->registers.a;
 	uint8_t e = this->registers.e;
 	char result = a - e;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(result);
 	flag_set(FLAG_SUBTRACT);
 	flag_test_half_carry(a, e);
@@ -474,7 +615,7 @@ void Z80::cp_h() {
 	uint8_t a = this->registers.a;
 	uint8_t h = this->registers.h;
 	char result = a - h;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(result);
 	flag_set(FLAG_SUBTRACT);
 	flag_test_half_carry(a, h);
@@ -485,7 +626,7 @@ void Z80::cp_l() {
 	uint8_t a = this->registers.a;
 	uint8_t l = this->registers.l;
 	char result = a - l;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(result);
 	flag_set(FLAG_SUBTRACT);
 	flag_test_half_carry(a, l);
@@ -496,7 +637,7 @@ void Z80::cp_hl() {
 	uint8_t a = this->registers.a;
 	uint16_t hl = this->registers.hl;
 	char result = a - hl;
-	this->clock.cycles += 8;
+	this->clock.ticks += 8;
 	flag_test_zero(result);
 	flag_set(FLAG_SUBTRACT);
 	flag_test_half_carry(a, hl);
@@ -505,93 +646,86 @@ void Z80::cp_hl() {
 
 void Z80::xor_a() {
 	this->registers.a ^= this->registers.a;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(this->registers.a);
-	flag_unset(FLAG_SUBTRACT);
-	flag_unset(FLAG_HALF_CARRY);
-	flag_unset(FLAG_CARRY);
+	flag_reset(FLAG_SUBTRACT);
+	flag_reset(FLAG_HALF_CARRY);
+	flag_reset(FLAG_CARRY);
 }
 
 void Z80::xor_b() {
 	this->registers.a ^= this->registers.b;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(this->registers.a);
-	flag_unset(FLAG_SUBTRACT);
-	flag_unset(FLAG_HALF_CARRY);
-	flag_unset(FLAG_CARRY);
+	flag_reset(FLAG_SUBTRACT);
+	flag_reset(FLAG_HALF_CARRY);
+	flag_reset(FLAG_CARRY);
 }
 
 void Z80::xor_c() {
 	this->registers.a ^= this->registers.c;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(this->registers.a);
-	flag_unset(FLAG_SUBTRACT);
-	flag_unset(FLAG_HALF_CARRY);
-	flag_unset(FLAG_CARRY);
+	flag_reset(FLAG_SUBTRACT);
+	flag_reset(FLAG_HALF_CARRY);
+	flag_reset(FLAG_CARRY);
 }
 
 void Z80::xor_d() {
 	this->registers.a ^= this->registers.d;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(this->registers.a);
-	flag_unset(FLAG_SUBTRACT);
-	flag_unset(FLAG_HALF_CARRY);
-	flag_unset(FLAG_CARRY);
+	flag_reset(FLAG_SUBTRACT);
+	flag_reset(FLAG_HALF_CARRY);
+	flag_reset(FLAG_CARRY);
 }
 
 void Z80::xor_e() {
 	this->registers.a ^= this->registers.e;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(this->registers.a);
-	flag_unset(FLAG_SUBTRACT);
-	flag_unset(FLAG_HALF_CARRY);
-	flag_unset(FLAG_CARRY);
+	flag_reset(FLAG_SUBTRACT);
+	flag_reset(FLAG_HALF_CARRY);
+	flag_reset(FLAG_CARRY);
 }
 
 void Z80::xor_h() {
 	this->registers.a ^= this->registers.h;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(this->registers.a);
-	flag_unset(FLAG_SUBTRACT);
-	flag_unset(FLAG_HALF_CARRY);
-	flag_unset(FLAG_CARRY);
+	flag_reset(FLAG_SUBTRACT);
+	flag_reset(FLAG_HALF_CARRY);
+	flag_reset(FLAG_CARRY);
 }
 
 void Z80::xor_l() {
 	this->registers.a ^= this->registers.l;
-	this->clock.cycles += 4;
+	this->clock.ticks += 4;
 	flag_test_zero(this->registers.a);
-	flag_unset(FLAG_SUBTRACT);
-	flag_unset(FLAG_HALF_CARRY);
-	flag_unset(FLAG_CARRY);
+	flag_reset(FLAG_SUBTRACT);
+	flag_reset(FLAG_HALF_CARRY);
+	flag_reset(FLAG_CARRY);
 }
 
 void Z80::xor_hl() {
 	this->registers.a ^= this->registers.hl;
-	this->clock.cycles += 8;
+	this->clock.ticks += 8;
 	flag_test_zero(this->registers.a);
-	flag_unset(FLAG_SUBTRACT);
-	flag_unset(FLAG_HALF_CARRY);
-	flag_unset(FLAG_CARRY);
+	flag_reset(FLAG_SUBTRACT);
+	flag_reset(FLAG_HALF_CARRY);
+	flag_reset(FLAG_CARRY);
 }
 
 void Z80::ldh_A_a8() {
 	uint8_t n = memory->readByte(this->registers.pc++);
 	this->registers.a = memory->readByte(0xFF00 + n);
-	this->clock.cycles += 12;
+	this->clock.ticks += 12;
 }
 
 void Z80::ldh_a8_A() {
 	uint8_t n = memory->readByte(this->registers.pc++);
 	memory->writeByte(0xFF00 + n, this->registers.a);
-	this->clock.cycles += 12;
-}
-
-void Z80::ld_hl_d16() {
-	uint8_t data = memory->readWord(this->registers.pc);
-	this->registers.pc += 2;
-	this->registers.hl = data;
-	this->clock.cycles += 12;
+	this->clock.ticks += 12;
 }
 
 void Z80::process_interrupts() {
@@ -655,7 +789,7 @@ void Z80::process_interrupts() {
 // Flag operations
 //
 
-void Z80::flag_test_zero(uint8_t val) {
+void Z80::flag_test_zero(uint16_t val) {
 	if (val == 0x00)
 		this->registers.f |= FLAG_ZERO;
 }
@@ -665,15 +799,19 @@ void Z80::flag_test_half_carry(int16_t a, int16_t b) {
 		this->registers.f |= FLAG_HALF_CARRY;
 }
 
-void Z80::flag_test_carry(uint8_t val) {
+void Z80::flag_test_carry(uint16_t val) {
 	if (val < 0)
 		this->registers.f |= FLAG_CARRY;
 }
 
-void Z80::flag_set(Z80::Flag flag) {
+void Z80::flag_set(Z80::OperationFlag flag) {
 	this->registers.f |= flag;
 }
 
-void Z80::flag_unset(Z80::Flag flag) {
+void Z80::flag_reset(Z80::OperationFlag flag) {
 	this->registers.f &= ~flag;
+}
+
+bool Z80::flag_check(Z80::OperationFlag flag) {
+	return (this->registers.f & flag) != 0x0;
 }

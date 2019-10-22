@@ -1,9 +1,13 @@
 #include "memory.h"
 #include <fstream>
+#include <iostream>
 
 void Memory::loadROM(std::string path) {
 	std::ifstream ifs(path, std::ios::binary);
-	if (ifs) ifs.read((char*)data, 0xFFFF);
+	if (ifs)
+		ifs.read((char*)data, 0xFFFF);
+	else
+		std::cerr << "Failed to open ROM: " << path << std::endl;
 	ifs.close();
 }
 

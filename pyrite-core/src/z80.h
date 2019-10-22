@@ -1,6 +1,6 @@
 #pragma once
 #include "memory.h"
-#include <stdint.h>
+#include <cstdint>
 
 /* Available interrupts. Cause the flow of the application to divert to certain important events such as rendering. */
 
@@ -44,14 +44,14 @@ struct Registers
 		uint16_t hl = 0;
 	};
 
-	uint16_t sp = 0; // Stack pointer
-	uint16_t pc = 0; // Program counter
+	uint16_t sp = 0;      // Stack pointer
+	uint16_t pc = 0x0100; // Program counter
 
 };
 
 struct Clock
 {
-	uint16_t cycles = 0;
+	uint16_t ticks = 0;
 };
 
 class Z80
@@ -70,7 +70,7 @@ class Z80
 	// Flags can be set during operations, The
 	// leftmost 4 bits are used for this purpose. The
 	// rightmost 4 bits are always 0.
-	enum Flag : uint8_t {
+	enum OperationFlag : uint8_t {
 		FLAG_ZERO =       0b10000000,
 		FLAG_SUBTRACT =   0b01000000,
 		FLAG_HALF_CARRY = 0b00100000,
@@ -79,13 +79,21 @@ class Z80
 
 	/* Helper fuctions for dealing with flags. */
 
-	void flag_test_zero(uint8_t val);
+	// Takes a byte and sets the zero flag
+	// if its value is 0.
+	void flag_test_zero(uint16_t val);
 	void flag_test_half_carry(int16_t a, int16_t b);
-	void flag_test_carry(uint8_t val);
-	void flag_set(Flag flag);
-	void flag_unset(Flag flag);
+	void flag_test_carry(uint16_t val);
+	// Sets a given flag to true state.
+	void flag_set(OperationFlag flag);
+	// Sets a given flag to false state.
+	void flag_reset(OperationFlag flag);
+	// Checks if a flag is currently set.
+	bool flag_check(Z80::OperationFlag flag);
 
 	/* Z80 Instruction set */
+
+	void not_yet_implemented(uint8_t instr);
 
 	void nop();       // 0x00
 	void ld_bc_d16(); // 0x01
@@ -104,8 +112,27 @@ class Z80
 	void ld_c_d8();   // 0x0E
 	void rrca();      // 0x0F
 
+	void stop_0();    // 0x10
+	void ld_de_d16(); // 0x11
+	void ld_de_a();   // 0x12
+	void inc_de();    // 0x13
+	void inc_d();     // 0x14
+	void dec_d();     // 0x15
+	void ld_d_d8();   // 0x16
+	void rla();       // 0x17
+	void jr_r8();     // 0x18
+	void add_hl_de(); // 0x19
+	void ld_a_de();   // 0x1A
+	void dec_de();    // 0x1B
+	void inc_e();     // 0x1C
+	void dec_e();     // 0x1D
+	void ld_e_d8();   // 0x1E
+	void rra();       // 0x1F
+
+	void jr_nz_r8();  // 0x20
 	void ld_hl_d16(); // 0x21
 
+	void ld_hld_a();  // 0x32
 	void inc_a();     // 0x3C
 
 	void halt();      // 0x76

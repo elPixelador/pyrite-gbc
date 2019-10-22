@@ -42,16 +42,16 @@ public:
 		// Update debugging info
 		auto registers = cpu->getRegisters();
 		auto textX = ScreenWidth() / 2 + 1;
-		DrawString(textX, 12 * 0, "PC: " + std::to_string(registers->pc));
-		DrawString(textX, 12 * 1, "SP: " + std::to_string(registers->sp));
-		DrawString(textX, 12 * 2, "A:  " + std::to_string(registers->a));
-		DrawString(textX, 12 * 3, "F:  " + std::to_string(registers->f));
-		DrawString(textX, 12 * 4, "B:  " + std::to_string(registers->b));
-		DrawString(textX, 12 * 5, "C:  " + std::to_string(registers->c));
-		DrawString(textX, 12 * 6, "D:  " + std::to_string(registers->d));
-		DrawString(textX, 12 * 7, "E:  " + std::to_string(registers->e));
-		DrawString(textX, 12 * 8, "H:  " + std::to_string(registers->h));
-		DrawString(textX, 12 * 9, "L:  " + std::to_string(registers->l));
+		DrawString(textX, 12 * 0, "PC:" + std::to_string(registers->pc));
+		DrawString(textX, 12 * 1, "SP:" + std::to_string(registers->sp));
+		DrawString(textX, 12 * 2, "A: " + std::to_string(registers->a));
+		DrawString(textX, 12 * 3, "F: " + std::to_string(registers->f));
+		DrawString(textX, 12 * 4, "B: " + std::to_string(registers->b));
+		DrawString(textX, 12 * 5, "C: " + std::to_string(registers->c));
+		DrawString(textX, 12 * 6, "D: " + std::to_string(registers->d));
+		DrawString(textX, 12 * 7, "E: " + std::to_string(registers->e));
+		DrawString(textX, 12 * 8, "H: " + std::to_string(registers->h));
+		DrawString(textX, 12 * 9, "L: " + std::to_string(registers->l));
 
 		return true;
 	}
