@@ -1,5 +1,6 @@
 #pragma once
 #include "memory.h"
+#include <stdint.h>
 
 /* Available interrupts. Cause the flow of the application to divert to certain important events such as rendering. */
 
