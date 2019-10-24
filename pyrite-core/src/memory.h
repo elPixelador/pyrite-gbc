@@ -28,11 +28,19 @@ class Memory {
 
 public:
 
+	// Loads the contents of a given cartridge into memory.
 	void loadCartridge(Cartridge* cartridge);
 
+	// Read a single bytes from the given address.
 	uint8_t readByte(uint16_t addr);
+
+	// Read two bytes starting from the given address.
 	uint16_t readWord(uint16_t addr);
+
+	// Write a single byte to the given address.
 	void writeByte(uint16_t addr, uint8_t byte);
-	void writeWord(uint16_t addr, uint16_t byte);
+
+	// Writes two bytes starting from the given address.
+	void writeWord(uint16_t addr, uint16_t word);
 
 };
