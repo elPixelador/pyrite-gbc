@@ -10,8 +10,8 @@ constexpr uint8_t INTERRUPT_TIMER_OVERFLOW = 0x4;
 constexpr uint8_t INTERRUPT_SERIAL_TRANSFER_COMPLETE = 0x8;
 constexpr uint8_t INTERRUPT_P10_P13_NEGATIVE_EDGE = 0x16;
 
-struct Registers
-{
+struct Registers{
+
 	union {
 		struct {
 			uint8_t a;
@@ -49,13 +49,11 @@ struct Registers
 
 };
 
-struct Clock
-{
+struct Clock{
 	uint16_t ticks = 0;
 };
 
-class Z80
-{
+class Z80{
 
 	Registers registers;
 	Clock clock;
@@ -97,7 +95,7 @@ class Z80
 
 	void nop();       // 0x00
 	void ld_bc_d16(); // 0x01
-	void ld_bc_a();   // 0x02
+	void ld_mbc_a();  // 0x02
 	void inc_bc();    // 0x03
 	void inc_b();     // 0x04
 	void dec_b();     // 0x05

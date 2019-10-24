@@ -1,14 +1,8 @@
 #include "memory.h"
-#include <fstream>
 #include <iostream>
 
-void Memory::loadROM(std::string path) {
-	std::ifstream ifs(path, std::ios::binary);
-	if (ifs)
-		ifs.read((char*)data, 0xFFFF);
-	else
-		std::cerr << "Failed to open ROM: " << path << std::endl;
-	ifs.close();
+void Memory::loadCartridge(Cartridge* cartridge) {
+	cartridge->loadROM0(this->data);
 }
 
 uint8_t Memory::readByte(uint16_t addr) {
@@ -16,7 +10,9 @@ uint8_t Memory::readByte(uint16_t addr) {
 }
 
 uint16_t Memory::readWord(uint16_t addr) {
-	return this->data[addr] | (this->data[addr + 1] << 8);
+	uint8_t hi = this->data[addr];
+	uint8_t lo = this->data[addr+1];
+	return hi | (lo << 8);
 }
 
 void Memory::writeByte(uint16_t addr, uint8_t byte) {
@@ -24,6 +20,8 @@ void Memory::writeByte(uint16_t addr, uint8_t byte) {
 }
 
 void Memory::writeWord(uint16_t addr, uint16_t word) {
-	this->data[addr] = word & 0xff;
-	this->data[addr+1] = (word >> 8);
+	uint8_t hi = word & 0xff;
+	uint8_t lo = (word >> 8);
+	this->data[addr] = hi;   
+	this->data[addr+1] = lo;
 }

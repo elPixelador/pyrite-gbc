@@ -1,6 +1,7 @@
 #include <iostream>
 #include "z80.h"
 #include "memory.h"
+#include "cartridge.h"
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
 
@@ -8,6 +9,7 @@ class PyriteUI : public olc::PixelGameEngine
 {
 	Z80* cpu;
 	Memory* memory;
+	Cartridge* cart;
 
 public:
 
@@ -15,6 +17,7 @@ public:
 		sAppName = "Pyrite GBC";
 		this->cpu = new Z80();
 		this->memory = new Memory();
+		this->cart = new Cartridge("./tetris.gb");
 	}
 
 	~PyriteUI() {
@@ -23,8 +26,8 @@ public:
 	}
 
 	bool OnUserCreate() override {
+		this->memory->loadCartridge(this->cart);
 		this->cpu->connectMemory(this->memory);
-		this->memory->loadROM("./tetris.gb");
 		return true;
 	}
 

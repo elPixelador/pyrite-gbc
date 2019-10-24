@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "cartridge.h"
 
 /* Important regions in memory. */
 
@@ -27,7 +28,7 @@ class Memory {
 
 public:
 
-	void loadROM(std::string path);
+	void loadCartridge(Cartridge* cartridge);
 
 	uint8_t readByte(uint16_t addr);
 	uint16_t readWord(uint16_t addr);

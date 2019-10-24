@@ -14,13 +14,11 @@ void Z80::tick() {
 
 	uint8_t instr = this->memory->readByte(this->registers.pc++);
 
-	std::cout << "Next Instr: 0x" << std::hex << static_cast<int>(instr) << std::endl;
-
 	switch (instr)
 	{
 	case 0x00: nop();                      break;
 	case 0x01: ld_bc_d16();                break;
-	case 0x02: ld_bc_a();                  break;
+	case 0x02: ld_mbc_a();                 break;
 	case 0x03: inc_bc();                   break;
 	case 0x04: inc_b();                    break;
 	case 0x05: dec_b();                    break;
@@ -50,7 +48,7 @@ void Z80::tick() {
 	case 0x1D: dec_e();                    break;
 	case 0x1E: ld_e_d8();                  break;
 	case 0x1F: rra();                      break;
-	case 0x20: jr_nz_r8(); break;
+	case 0x20: jr_nz_r8();                 break;
 	case 0x21: ld_hl_d16();                break;
 	case 0x22: not_yet_implemented(instr); break;
 	case 0x23: not_yet_implemented(instr); break;
@@ -292,7 +290,7 @@ void Z80::ld_bc_d16() {
 	this->clock.ticks += 12;
 }
 
-void Z80::ld_bc_a() {
+void Z80::ld_mbc_a() {
 	this->memory->writeByte(this->registers.bc, this->registers.a);
 	this->clock.ticks += 8;
 }
@@ -506,7 +504,7 @@ void Z80::jr_nz_r8() {
 }
 
 void Z80::ld_hl_d16() {
-	uint8_t data = memory->readWord(this->registers.pc);
+	uint16_t data = memory->readWord(this->registers.pc);
 	this->registers.pc += 2;
 	this->registers.hl = data;
 	this->clock.ticks += 12;

@@ -4,12 +4,14 @@ set(
     HEADER_FILES
     ${SRC_DIR}/z80.h 
     ${SRC_DIR}/memory.h
+	${SRC_DIR}/cartridge.h
 )
 
 set(
     SOURCE_FILES 
     ${SRC_DIR}/z80.cpp
     ${SRC_DIR}/memory.cpp
+	${SRC_DIR}/cartridge.cpp
 )
 
 add_library(pyrite-core STATIC ${HEADER_FILES} ${SOURCE_FILES})
