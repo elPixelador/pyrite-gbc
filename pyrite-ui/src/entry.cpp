@@ -7,7 +7,7 @@
 
 class PyriteUI : public olc::PixelGameEngine
 {
-	Z80* cpu;
+	CPU* cpu;
 	Memory* memory;
 	Cartridge* cart;
 
@@ -15,7 +15,7 @@ public:
 
 	PyriteUI() {
 		sAppName = "Pyrite GBC";
-		this->cpu = new Z80();
+		this->cpu = new CPU();
 		this->memory = new Memory();
 		this->cart = new Cartridge("./tetris.gb");
 	}
@@ -55,6 +55,10 @@ public:
 		DrawString(textX, 12 * 7, "E: " + std::to_string(registers->e));
 		DrawString(textX, 12 * 8, "H: " + std::to_string(registers->h));
 		DrawString(textX, 12 * 9, "L: " + std::to_string(registers->l));
+
+		DrawString(textX + 55, 12 * 0, "IE: " + std::to_string(cpu->getIEFlag()));
+		DrawString(textX + 55, 12 * 1, "IF: " + std::to_string(cpu->getIFFlag()));
+		DrawString(textX + 55, 12 * 2, "IME:" + std::to_string(cpu->getInterruptMasterEnable()));
 
 		return true;
 	}

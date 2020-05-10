@@ -2,11 +2,11 @@
 #include "z80.h"
 #include "memory.h"
 
-static Z80* cpu;
+static CPU* cpu;
 static Memory* memory;
 
 void test_setup() {
-	cpu = new Z80();
+	cpu = new CPU();
 	memory = new Memory();
 }
 

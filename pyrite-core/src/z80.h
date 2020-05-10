@@ -53,7 +53,7 @@ struct Clock{
 	uint16_t ticks = 0;
 };
 
-class Z80{
+class CPU{
 
 	Registers registers;
 	Clock clock;
@@ -67,7 +67,7 @@ class Z80{
 
 	// Flags can be set during operations, The
 	// leftmost 4 bits are used for this purpose. The
-	// rightmost 4 bits are always 0.
+	// rightmost 4 bits are reserved.
 	enum OperationFlag : uint8_t {
 		FLAG_ZERO =       0b10000000,
 		FLAG_SUBTRACT =   0b01000000,
@@ -87,7 +87,7 @@ class Z80{
 	// Sets a given flag to false state.
 	void flag_reset(OperationFlag flag);
 	// Checks if a flag is currently set.
-	bool flag_check(Z80::OperationFlag flag);
+	bool flag_check(CPU::OperationFlag flag);
 
 	/* Z80 Instruction set */
 
@@ -159,6 +159,8 @@ class Z80{
 	void ldh_a8_A();  // 0xE0
 
 	void ldh_A_a8();  // 0xF0
+	void di();        // 0xF3
+	void ei();        // 0xFB
 
 public:
 
@@ -170,6 +172,18 @@ public:
 
 	Registers const* const getRegisters() const {
 		return &registers;
+	}
+
+	uint8_t getIEFlag() const {
+		return this->IE;
+	}
+
+	uint8_t getIFFlag() const {
+		return this->IF;
+	}
+
+	bool getInterruptMasterEnable() const {
+		return this->IME;
 	}
 
 };
