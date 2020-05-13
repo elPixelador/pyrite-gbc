@@ -31,7 +31,7 @@ public:
 	// Loads the contents of a given cartridge into memory.
 	void loadCartridge(Cartridge* cartridge);
 
-	// Read a single bytes from the given address.
+	// Read a single byte from the given address.
 	uint8_t readByte(uint16_t addr);
 
 	// Read two bytes starting from the given address.

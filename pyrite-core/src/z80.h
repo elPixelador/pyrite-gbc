@@ -2,6 +2,8 @@
 #include "memory.h"
 #include <cstdint>
 
+constexpr uint16_t CLOCK_SPEED = 4194304;
+
 /* Available interrupts. Cause the flow of the application to divert to certain important events such as rendering. */
 
 constexpr uint8_t INTERRUPT_VERTICAL_BLANKING = 0x1;
@@ -164,7 +166,7 @@ class CPU{
 
 public:
 
-	void tick();
+	uint16_t tick();
 
 	void connectMemory(Memory* memory) {
 		this->memory = memory;

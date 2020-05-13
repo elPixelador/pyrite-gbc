@@ -6,7 +6,9 @@ void CPU::not_yet_implemented(uint8_t instr) {
 	this->registers.pc--;
 }
 
-void CPU::tick() {
+uint16_t CPU::tick() {
+
+	auto startTicks = this->clock.ticks;
 
 	if (this->registers.pc == 0x2817) {
 		std::cout << "Loading gpu data" << std::endl;
@@ -277,6 +279,9 @@ void CPU::tick() {
 
 	process_interrupts();
 
+	auto endTicks = this->clock.ticks;
+
+	return endTicks - startTicks;
 }
 
 void CPU::nop() {
