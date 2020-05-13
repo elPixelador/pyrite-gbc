@@ -35,6 +35,8 @@ public:
 	bool OnUserCreate() override {
 		this->memory->loadCartridge(this->cart);
 		this->cpu->connectMemory(this->memory);
+		this->ppu->connectMemory(this->memory);
+		this->ppu->connectCPU(this->cpu);
 		return true;
 	}
 
