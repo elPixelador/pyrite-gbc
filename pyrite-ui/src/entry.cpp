@@ -53,7 +53,7 @@ public:
 		// Emulate system
 		while(ticksExecuted <= ticksPerFrame) {
 			ticksExecuted += cpu->tick();
-			ticksExecuted += ppu->tick();
+			ticksExecuted += ppu->tick(ticksExecuted);
 		}
 
 		// Update game screen
