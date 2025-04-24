@@ -11,7 +11,7 @@
             "program": "${workspaceFolder}/build/pyrite-ui/Debug/pyrite-ui.exe", // Or your executable name
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/build",
+            "cwd": "${workspaceFolder}/build/pyrite-ui/Debug/",
             "environment": [],
             "externalConsole": true,
             "preLaunchTask": "build" // Optional: Task to build your project before debugging
