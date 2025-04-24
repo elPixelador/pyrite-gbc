@@ -94,9 +94,9 @@ public:
 
 int main(int argc, char** argv) {
 
-	PyriteUI demo;
-	if (demo.Construct(160 * 2, 144, 5, 5))
-		demo.Start();
+	PyriteUI ui;
+	if (ui.Construct(160 * 2, 144, 5, 5))
+		ui.Start();
 
     return 0;
 
