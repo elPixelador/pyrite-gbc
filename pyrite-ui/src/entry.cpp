@@ -17,12 +17,12 @@ class PyriteUI : public olc::PixelGameEngine
 
 public:
 
-	PyriteUI() {
+	PyriteUI(std::string cartridge) {
 		sAppName = "Pyrite GBC";
 		this->cpu = new CPU();
 		this->ppu = new PPU();
 		this->memory = new Memory();
-		this->cart = new Cartridge("./tetris.gb");
+		this->cart = new Cartridge(cartridge);
 	}
 
 	~PyriteUI() {
@@ -64,6 +64,7 @@ public:
 		// Update debugging info
 		auto registers = cpu->getRegisters();
 		auto textX = ScreenWidth() / 2 + 1;
+
 		DrawString(textX, (12 * 0) + 1, "PC:" + std::to_string(registers->pc));
 		DrawString(textX, (12 * 1) + 1, "SP:" + std::to_string(registers->sp));
 		DrawString(textX, (12 * 2) + 1, "A: " + std::to_string(registers->a));
@@ -92,12 +93,17 @@ public:
 	}
 };
 
-int main(int argc, char** argv) {
+std::string extractCartridgeArgument(int argc, char** argv) {
+	if (argc < 2) {
+		std::cerr << "Usage: " << argv[0] << "<cartridge>" << std::endl;
+		return std::string();
+	}
+	return std::string(argv[1]);
+}
 
-	PyriteUI ui;
+int main(int argc, char** argv) {
+	PyriteUI ui(extractCartridgeArgument(argc, argv));
 	if (ui.Construct(160 * 2, 144, 5, 5))
 		ui.Start();
-
     return 0;
-
 }

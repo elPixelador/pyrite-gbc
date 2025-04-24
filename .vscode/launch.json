@@ -9,7 +9,9 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/pyrite-ui/Debug/pyrite-ui.exe", // Or your executable name
-            "args": [],
+            "args": [
+                "./tetris.gb"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build/pyrite-ui/Debug/",
             "environment": [],
