@@ -1,5 +1,6 @@
 {
     "files.associations": {
         "cstdint": "cpp"
-    }
+    },
+    "C_Cpp.default.compilerPath": "c:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.43.34808\\bin\\Hostx64\\x64\\cl.exe"
 }
