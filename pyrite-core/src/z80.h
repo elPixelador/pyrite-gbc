@@ -2,7 +2,7 @@
 #include "memory.h"
 #include <cstdint>
 
-constexpr uint32_t CLOCK_SPEED = 4194304;
+constexpr uint16_t CLOCK_SPEED = 4194304;
 
 /* Available interrupts. Cause the flow of the application to divert to certain important events such as rendering. */
 
@@ -64,7 +64,6 @@ class CPU{
 	uint8_t IE = 0;   // Interrupt enable
 	uint8_t IF = 0;   // Interrupt request
 	bool IME = false; // Interrupt master enable
-	bool HALT = false; // Halt state
 
 	void process_interrupts();
 
@@ -95,7 +94,6 @@ class CPU{
 	/* Z80 Instruction set */
 
 	void not_yet_implemented(uint8_t instr);
-	void not_yet_implemented_prefix(uint8_t instr);
 
 	void nop();       // 0x00
 	void ld_bc_d16(); // 0x01
@@ -133,21 +131,13 @@ class CPU{
 
 	void jr_nz_r8();  // 0x20
 	void ld_hl_d16(); // 0x21
-	void daa();       // 0x27
-	void ld_a_hli();  // 0x2A
-	void cpl();       // 0x2F
 
-	void ld_sp_d16(); // 0x31
 	void ld_hld_a();  // 0x32
-	void ld_hl_n8();  // 0x36
-	
 	void inc_a();     // 0x3C
-	void ld_a_d8();   // 0x3E
 
 	void halt();      // 0x76
 
 	void xor_a();     // 0xAF
-	void and_hl();    // 0xA6
 	void xor_b();     // 0xA8
 	void xor_c();     // 0xA9
 	void xor_d();     // 0xAA
@@ -165,47 +155,15 @@ class CPU{
 	void cp_l();      // 0xBD
 	void cp_hl();     // 0xBE
 
-	void prefix();    // 0xCB
-	void call_a16();  // 0xCD
-	void adc_a_n8();  // 0xCE
-	void ret_nz();    // 0xC0
 	void jp_a16();    // 0xC3
 	void ret();		  // 0xC9
 
 	void ldh_a8_A();  // 0xE0
-	void ld_c_a();    // 0xE2
-	void and_n8();    // 0xE6
-	void ld_a16_a();  // 0xEA
 
 	void ldh_A_a8();  // 0xF0
 	void di();        // 0xF3
-	void ld_sp_hl();  // 0xF9
-	void ld_a_a16();  // 0xFA
 	void ei();        // 0xFB
-	void cp_a_n8();   // 0xFE
-	
-	/* Z80 Prefix Instruction Set */
 
-	void rlc_b();
-	void rlc_c();
-	void rlc_d();
-	void rlc_e();
-	void rlc_h();
-	void rlc_l();
-	void rlc_hl_indirect();
-	void rlc_a();
-	void rrc_b();
-	void rrc_c();
-	void rrc_d();
-	void rrc_e();
-	void rrc_h();
-	void rrc_l();
-	void rrc_hl_indirect();
-	void rrc_a();
-	void bit_0_c();
-	void bit_7_h();
-	void srl_hl_indirect();
-	
 public:
 
 	uint16_t tick();

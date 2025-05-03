@@ -47,15 +47,14 @@ public:
 		Clear(olc::BLACK);
 		
 		uint16_t ticksPerFrame = CLOCK_SPEED / FRAMES_PER_SECOND;
-		std::chrono::nanoseconds frameTime(16666667);
-		uint16_t ticksExecutedThisFrame = 0;
+		std::chrono::nanoseconds frameTime(16600000);
+		uint16_t ticksExecuted = 0;
 
-    	// Emulate system for one frame
-    	while (ticksExecutedThisFrame < ticksPerFrame) {
-        	uint16_t cpuTicks = cpu->tick();
-        	ticksExecutedThisFrame += cpuTicks;
-        	ppu->tick(cpuTicks); // Pass the number of CPU ticks to the PPU
-    	}
+		// Emulate system
+		while(ticksExecuted <= ticksPerFrame) {
+			ticksExecuted += cpu->tick();
+			ticksExecuted += ppu->tick(ticksExecuted);
+		}
 
 		// Update game screen
 		for (int x = 0; x < ScreenWidth() / 2; x++)
