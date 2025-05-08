@@ -98,7 +98,7 @@ public:
 		}
 
 		// Write register log to a file
-		std::ofstream logFile("register_log.txt", std::ios::app);
+		std::ofstream logFile("register_log.txt", std::ios::trunc);
 		if (logFile.is_open())
 		{
 			logFile << registerLog << std::endl;

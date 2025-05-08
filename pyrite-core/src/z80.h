@@ -229,7 +229,10 @@ public:
 		output += "L:" + hexString(this->registers.l) + " ";
 		output += "SP:" + hexString(this->registers.sp) + " ";
 		output += "PC:" + hexString(this->registers.pc) + " ";
-		output += "PCMEM:" + hexString(this->memory->readByte(this->registers.pc));
+		output += "PCMEM:" + hexString(this->registers.pc) + "," +
+				  hexString(this->registers.pc) + "," +
+				  hexString(this->registers.pc) + "," +
+				  hexString(this->registers.pc);
 	}
 
 	std::string CPU::hexString(uint16_t value)
