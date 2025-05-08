@@ -1,6 +1,8 @@
 #pragma once
 #include "memory.h"
 #include <cstdint>
+#include <iomanip>
+#include <sstream>
 
 constexpr uint16_t CLOCK_SPEED = 4194304;
 
@@ -217,16 +219,30 @@ public:
 
 	void logStateToLine(std::string &output)
 	{
-		output += "A: " + std::to_string(this->registers.a) + " ";
-		output += "F: " + std::to_string(this->registers.f) + " ";
-		output += "B: " + std::to_string(this->registers.b) + " ";
-		output += "C: " + std::to_string(this->registers.c) + " ";
-		output += "D: " + std::to_string(this->registers.d) + " ";
-		output += "E: " + std::to_string(this->registers.e) + " ";
-		output += "H: " + std::to_string(this->registers.h) + " ";
-		output += "L: " + std::to_string(this->registers.l) + " ";
-		output += "SP: " + std::to_string(this->registers.sp) + " ";
-		output += "PC: " + std::to_string(this->registers.pc) + " ";
-		output += "PCMEM: " + std::to_string(this->memory->readByte(this->registers.pc));
+		output += "A:" + hexString(this->registers.a) + " ";
+		output += "F:" + hexString(this->registers.f) + " ";
+		output += "B:" + hexString(this->registers.b) + " ";
+		output += "C:" + hexString(this->registers.c) + " ";
+		output += "D:" + hexString(this->registers.d) + " ";
+		output += "E:" + hexString(this->registers.e) + " ";
+		output += "H:" + hexString(this->registers.h) + " ";
+		output += "L:" + hexString(this->registers.l) + " ";
+		output += "SP:" + hexString(this->registers.sp) + " ";
+		output += "PC:" + hexString(this->registers.pc) + " ";
+		output += "PCMEM:" + hexString(this->memory->readByte(this->registers.pc));
+	}
+
+	std::string CPU::hexString(uint16_t value)
+	{
+		std::stringstream stream;
+		stream << std::hex << std::uppercase << std::setw(4) << std::setfill('0') << value;
+		return stream.str();
+	}
+
+	std::string CPU::hexString(uint8_t value)
+	{
+		std::stringstream stream;
+		stream << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << (int)value;
+		return stream.str();
 	}
 };
