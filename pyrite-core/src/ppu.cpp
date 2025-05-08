@@ -1,6 +1,7 @@
 #include "ppu.h"
 
-uint16_t PPU::tick(uint16_t elapsedTicksThisFrame) {
+uint16_t PPU::tick(uint16_t elapsedTicksThisFrame)
+{
 
 	// A single frame is 154 scanlines (70224 ticks)
 
@@ -17,7 +18,7 @@ uint16_t PPU::tick(uint16_t elapsedTicksThisFrame) {
 	//         2 : During Searching OAM
 	//         3 : During Transferring Data to LCD Driver
 
-	uint8_t lcdcRegister = this->memory->readByte(LCD_STATUS_REGISTER);
+	uint8_t lcdcRegister = this->memory->readByte(LCD_STAT_REGISTER);
 
 	// TODO: Some magical shit here
 
@@ -27,7 +28,7 @@ uint16_t PPU::tick(uint16_t elapsedTicksThisFrame) {
 
 	// Horizontal Blank
 
-	this->memory->writeByte(LCD_STATUS_REGISTER, lcdcRegister);
+	this->memory->writeByte(LCD_STAT_REGISTER, lcdcRegister);
 
 	return 70224;
 }

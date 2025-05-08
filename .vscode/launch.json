@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/pyrite-ui/Debug/pyrite-ui.exe", // Or your executable name
             "args": [
-                "./tetris.gb"
+                "./cpu_instrs.gb"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build/pyrite-ui/Debug/",

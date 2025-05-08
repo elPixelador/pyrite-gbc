@@ -10,14 +10,14 @@
 
 class PyriteUI : public olc::PixelGameEngine
 {
-	CPU* cpu;
-	PPU* ppu;
-	Memory* memory;
-	Cartridge* cart;
+	CPU *cpu;
+	PPU *ppu;
+	Memory *memory;
+	Cartridge *cart;
 
 public:
-
-	PyriteUI(std::string cartridge) {
+	PyriteUI(std::string cartridge)
+	{
 		sAppName = "Pyrite GBC";
 		this->cpu = new CPU();
 		this->ppu = new PPU();
@@ -25,14 +25,16 @@ public:
 		this->cart = new Cartridge(cartridge);
 	}
 
-	~PyriteUI() {
+	~PyriteUI()
+	{
 		delete this->cpu;
 		delete this->memory;
 		delete this->ppu;
 		delete this->cart;
 	}
 
-	bool OnUserCreate() override {
+	bool OnUserCreate() override
+	{
 		this->memory->loadCartridge(this->cart);
 		this->cpu->connectMemory(this->memory);
 		this->ppu->connectMemory(this->memory);
@@ -40,19 +42,24 @@ public:
 		return true;
 	}
 
-	bool OnUserUpdate(float delta) override {
+	bool OnUserUpdate(float delta) override
+	{
 
 		auto start = std::chrono::steady_clock::now();
 
 		Clear(olc::BLACK);
-		
+
 		uint16_t ticksPerFrame = CLOCK_SPEED / FRAMES_PER_SECOND;
 		std::chrono::nanoseconds frameTime(16600000);
 		uint16_t ticksExecuted = 0;
 
+		std::string registerLog;
+
 		// Emulate system
-		while(ticksExecuted <= ticksPerFrame) {
+		while (ticksExecuted <= ticksPerFrame)
+		{
 			ticksExecuted += cpu->tick();
+			cpu->logStateToLine(registerLog);
 			ticksExecuted += ppu->tick(ticksExecuted);
 		}
 
@@ -84,26 +91,38 @@ public:
 		auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
 		// Wait until we reach our target frame rate.
-		while (elapsed < frameTime) {
+		while (elapsed < frameTime)
+		{
 			end = std::chrono::steady_clock::now();
 			elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+		}
+
+		// Write register log to a file
+		std::ofstream logFile("register_log.txt", std::ios::app);
+		if (logFile.is_open())
+		{
+			logFile << registerLog << std::endl;
+			logFile.close();
 		}
 
 		return true;
 	}
 };
 
-std::string extractCartridgeArgument(int argc, char** argv) {
-	if (argc < 2) {
+std::string extractCartridgeArgument(int argc, char **argv)
+{
+	if (argc < 2)
+	{
 		std::cerr << "Usage: " << argv[0] << "<cartridge>" << std::endl;
 		return std::string();
 	}
 	return std::string(argv[1]);
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv)
+{
 	PyriteUI ui(extractCartridgeArgument(argc, argv));
 	if (ui.Construct(160 * 2, 144, 5, 5))
 		ui.Start();
-    return 0;
+	return 0;
 }
